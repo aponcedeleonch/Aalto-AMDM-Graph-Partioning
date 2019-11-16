@@ -55,7 +55,7 @@ def laplacian_and_eigenvalues(G, logger):
     # Get the eigenvalues and eigenvectors
     logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
     eigenval, eigenvec = np.linalg.eig(L_numpy)
-
+    logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
 
 
