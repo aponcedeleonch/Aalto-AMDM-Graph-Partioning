@@ -4,6 +4,7 @@ import argparse
 import networkx as nx
 import numpy as np
 import logging
+import time
 
 
 # Parse script arguments
@@ -54,7 +55,9 @@ def laplacian_and_eigenvalues(G, logger):
     L_numpy = L.todense()
     # Get the eigenvalues and eigenvectors
     logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
-    eigenval, eigenvec = np.linalg.eig(L_numpy)
+    # Note use of function eigh over eig.
+    # eigh for real symmetric matrix
+    eigenval, eigenvec = np.linalg.eigh(L_numpy)
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
 
@@ -80,4 +83,5 @@ if __name__ == '__main__':
         graph_file_content = file.read()
     # Get a graph object from the file content
     G_meta, G = get_graph(graph_file_content, logger)
+    start_time = time.time()
     L, eigenval, eigenvec = laplacian_and_eigenvalues(G, logger)
