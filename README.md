@@ -10,14 +10,13 @@ Developed by:
 
 Links to libraries used during the realization of the project
 
-* [Graph](https://networkx.github.io/documentation/networkx-1.10/reference/classes.graph.html) - For constructring graphs using NetworkX package in python
-* [Laplacian Matrix](https://networkx.github.io/documentation/networkx-1.10/reference/generated/networkx.linalg.laplacianmatrix.laplacian_matrix.html) - For getting the Laplacian matrix of the graph
+* [Graph](https://networkx.github.io/documentation/networkx-2.4/reference/introduction.html#graphs) - For constructring graphs using NetworkX package in python
+* [Laplacian Matrix](https://networkx.github.io/documentation/networkx-2.4/reference/linalg.html#module-networkx.linalg.laplacianmatrix) - For getting the Laplacian matrix of the graph
 * [Eigenvalues and Eigenvectors](https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.eig.html) - For getting the Eigenvalues and Eigenvectors of the Laplacian Matrix. Numpy function.
 * [Eigenvalues and Eigenvectors of Real symmetric matrix](https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.eigh.html#numpy.linalg.eigh) - For getting the Eigenvalues and Eigenvectors of the Laplacian Matrix. Numpy function.
 * [K-Means](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) - For computing K-means algorithm to cluster.
 * [Logger](https://docs.python.org/3/library/logging.html) - For logging into console and to a file.
-* [Argparse](https://docs.python.org/3/howto/argparse.html) - For parsing arguments from the command line.
-
+* [Argparse](https://docs.python.org/3/howto/argparse.https://docs.python.org/3/library/time.htmlhttps://docs.python.org/3/howto/argparse.html) - For timing the execution of the program and getting running machine time.
 
 ### Installation
 

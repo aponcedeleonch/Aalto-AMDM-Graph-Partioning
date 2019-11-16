@@ -105,10 +105,38 @@ def output_file(g_meta, clustered, logger):
         cluster_str += '%d %d\n' % (i, cluster)
 
     # Constructing the output filename
-    str_time = time.strftime("%m-%d-%Y_%H-%M", time.gmtime())
+    str_time = time.strftime("%m-%d-%Y_%H_%M", time.localtime())
     out_name = '%s_output_%s.txt' % (g_meta['name'], str_time)
 
     return out_name, header + cluster_str
+
+
+def score_function(clustered, k, G, logger):
+    logger.debug('Getting score for the clustering')
+    k_score = []
+    # Iterate over the k clusters
+    for i in range(1, k+1):
+        # Get the nodes that were classified as the cluster k
+        indexes = np.where(clustered == i)[0]
+        cluster_size = len(indexes)
+        logger.debug('Cluster: %d. Number of nodes: %d' % (i, cluster_size))
+        edge_diff_cluster = 0
+        # Iterate over the nodes in cluster k
+        for idx in indexes:
+            node_cluster = clustered[idx]
+            # Iterate over the neighbors of the node
+            for neigh in G[str(idx)]:
+                neigh_cluster = clustered[int(neigh)]
+                # Check if the neighbor is in the same cluster as current node
+                if node_cluster != neigh_cluster:
+                    edge_diff_cluster += 1
+        # Get the score for the cluster k. Store it
+        cluster_score = edge_diff_cluster/cluster_size
+        logger.debug('Cluster: %d. Edges cutting clusters: %d' % (i, edge_diff_cluster))
+        logger.debug('Cluster: %d. Score: %.10f' % (i, cluster_score))
+        k_score.append(cluster_score)
+
+    return sum(k_score)
 
 
 if __name__ == '__main__':
@@ -119,7 +147,7 @@ if __name__ == '__main__':
     numeric_log_level = getattr(logging, args.log, None)
     logging.basicConfig(
         format='%(asctime)s %(levelname)s: %(message)s',
-        datefmt='%m/%d/%Y %I:%M:%S %p',
+        datefmt='%m/%d/%Y %H:%M:%S %p',
         level=numeric_log_level,
         handlers=[
             logging.FileHandler(args.file),
@@ -149,3 +177,7 @@ if __name__ == '__main__':
         file.write(out_str)
     end_time = time.time()
     logger.debug('Finished execution. Elapsed time: %d sec' % (end_time - start_time))
+    score = score_function(cluster_labels, G_meta['k'], G, logger)
+    logger.debug('Score obtained from clustering: %.10f' % (score))
+    end_time_score = time.time()
+    logger.debug('Finished score execution. Elapsed time: %d sec' % (end_time_score - end_time))
