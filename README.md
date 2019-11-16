@@ -14,8 +14,10 @@ Links to libraries used during the realization of the project
 * [Laplacian Matrix](https://networkx.github.io/documentation/networkx-1.10/reference/generated/networkx.linalg.laplacianmatrix.laplacian_matrix.html) - For getting the Laplacian matrix of the graph
 * [Eigenvalues and Eigenvectors](https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.eig.html) - For getting the Eigenvalues and Eigenvectors of the Laplacian Matrix. Numpy function.
 * [Eigenvalues and Eigenvectors of Real symmetric matrix](https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.eigh.html#numpy.linalg.eigh) - For getting the Eigenvalues and Eigenvectors of the Laplacian Matrix. Numpy function.
+* [K-Means](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) - For computing K-means algorithm to cluster.
 * [Logger](https://docs.python.org/3/library/logging.html) - For logging into console and to a file.
 * [Argparse](https://docs.python.org/3/howto/argparse.html) - For parsing arguments from the command line.
+
 
 ### Installation
 

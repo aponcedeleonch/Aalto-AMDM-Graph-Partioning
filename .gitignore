@@ -1,6 +1,9 @@
 # MAC stuff
 .DS_Store
 
+# Results from script
+*output*
+
 # Virtual env
 *env*
 
