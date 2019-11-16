@@ -1,4 +1,4 @@
-# Graph partioning into communities
+# Script for Graph partioning into communities
 
 Course project of Algorithmic Methods of Data Mining. Winter semester 2019 at Aalto University.
 
