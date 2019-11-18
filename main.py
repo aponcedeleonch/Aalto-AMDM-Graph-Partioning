@@ -164,8 +164,8 @@ if __name__ == '__main__':
     with open(out_name, 'w') as file:
         file.write(out_str)
     end_time = time.time()
-    logger.debug('Finished execution. Elapsed time: %d sec' % (end_time - start_time))
+    logger.debug('Finished execution. Elapsed time: %.10f sec' % (end_time - start_time))
     score = score_function(cluster_labels, G_meta['k'], G, logger)
     logger.debug('Score obtained from clustering: %.10f' % (score))
     end_time_score = time.time()
-    logger.debug('Finished score execution. Elapsed time: %d sec' % (end_time_score - end_time))
+    logger.debug('Finished score execution. Elapsed time: %.10f sec' % (end_time_score - end_time))
