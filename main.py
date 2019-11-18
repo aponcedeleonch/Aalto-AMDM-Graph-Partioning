@@ -55,21 +55,7 @@ def get_graph(graph_file, logger):
     return graph_meta, G
 
 
-def laplacian_and_eigenvalues(G, logger):
-    # Get the Laplacian matrix from the graph
-    logger.debug('Getting Laplacian matrix')
-    L = nx.laplacian_matrix(G)
-    L_numpy = L.todense()
-    # Get the eigenvalues and eigenvectors
-    logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
-    # Note use of function eigh over eig.
-    # eigh for real symmetric matrix
-    eigenval, eigenvec = np.linalg.eigh(L_numpy)
-    logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
-    return L, eigenval, eigenvec
-
-
-def k_laplacian_and_eigenvalues(G, k, logger):
+def laplacian_and_k_eigenval_eigenvec(G, k, logger):
     # Get the Laplacian matrix from the graph
     logger.debug('Getting Laplacian matrix')
     L = nx.laplacian_matrix(G)
@@ -82,21 +68,6 @@ def k_laplacian_and_eigenvalues(G, k, logger):
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
-
-
-def get_k_eigenvectors(eigenval, eigenvec, k, logger):
-    # Getting the sorted indexes
-    logger.debug('Getting sorted indexes for eigenvectors and eigenvalues')
-    idx = eigenval.argsort()[::-1]
-    # Sorting eigenvalues and eigenvectors
-    logger.debug('Sorting eigenvectors and eigenvalues')
-    eigenval = eigenval[idx]
-    eigenvec = eigenvec[:, idx]
-    logger.debug('Getting the first k-eigenvectors and values')
-    k_eigenval = eigenval[:k]
-    k_eigenvec = eigenvec[:, :k]
-
-    return k_eigenval, k_eigenvec
 
 
 def cluster_k_means(k_eig, k, logger):
@@ -183,27 +154,9 @@ if __name__ == '__main__':
         graph_file_content = file.read()
     # Get a graph object from the file content
     G_meta, G = get_graph(graph_file_content, logger)
-
-    start_eigh = time.time()
-    # Get Laplacian, eigenvalues and eigenvectors of it
-    L, eigenval, eigenvec = laplacian_and_eigenvalues(G, logger)
-    # Get only the first k eigenvectors
-    k_eigenval, k_eigenvec = get_k_eigenvectors(eigenval, eigenvec, G_meta['k'], logger)
-    logger.debug("Shape of eigenvector matrix: %s" % (k_eigenvec.shape, ))
-    end_eigh = time.time()
-
-    # Get Laplacian, eigenvalues and eigenvectors of it
-    L, keigenval, keigenvec = k_laplacian_and_eigenvalues(G, G_meta['k'], logger)
-    logger.debug("Shape of K eigenvector matrix: %s" % (keigenvec.shape, ))
-    end_eigsh = time.time()
-
-    logger.debug('Execution time eigh. Elapsed time: %d sec' % (end_eigh - start_eigh))
-    logger.debug(k_eigenval)
-    logger.debug(k_eigenvec)
-    logger.debug('Execution time eigsh. Elapsed time: %d sec' % (end_eigsh - end_eigh))
-    logger.debug(keigenval)
-    logger.debug(keigenvec)
-
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], logger)
+    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
     # Getting the data to writhe to file
