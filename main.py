@@ -73,7 +73,7 @@ def cluster_k_means(k_eig, k, logger):
     logger.debug('Using k-means to cluster the vertices')
     kmeans = KMeans(n_clusters=k).fit(k_eig)
     logger.debug('K-means finished. Returning the results')
-    return kmeans.labels_ + 1
+    return kmeans.labels_
 
 
 def output_file(g_meta, clustered, logger):
@@ -105,7 +105,7 @@ def score_function(clustered, k, G, logger):
     logger.debug('Getting score for the clustering')
     k_score = []
     # Iterate over the k clusters
-    for i in range(1, k+1):
+    for i in range(k):
         # Get the nodes that were classified as the cluster k
         indexes = np.where(clustered == i)[0]
         cluster_size = len(indexes)
