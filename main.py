@@ -60,11 +60,10 @@ def laplacian_and_k_eigenval_eigenvec(G, k, logger):
     logger.debug('Getting Laplacian matrix')
     L = nx.laplacian_matrix(G)
     L_double = L.asfptype()
-    # L_numpy = L.todense()
     # Get the eigenvalues and eigenvectors
     logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
-    # Note use of function eigh over eig.
-    # eigh for real symmetric matrix
+    # Note use of function eigsh over eig.
+    # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
