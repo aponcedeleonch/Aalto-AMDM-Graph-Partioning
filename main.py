@@ -6,6 +6,7 @@ import numpy as np
 import logging
 import time
 from sklearn.cluster import KMeans
+from scipy import sparse
 
 
 # Parse script arguments
@@ -72,12 +73,13 @@ def k_laplacian_and_eigenvalues(G, k, logger):
     # Get the Laplacian matrix from the graph
     logger.debug('Getting Laplacian matrix')
     L = nx.laplacian_matrix(G)
-    L_numpy = L.todense()
+    L_double = L.asfptype()
+    # L_numpy = L.todense()
     # Get the eigenvalues and eigenvectors
     logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigh over eig.
     # eigh for real symmetric matrix
-    eigenval, eigenvec = np.linalg.eigsh(L_numpy, k=k)
+    eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
 
@@ -90,10 +92,11 @@ def get_k_eigenvectors(eigenval, eigenvec, k, logger):
     logger.debug('Sorting eigenvectors and eigenvalues')
     eigenval = eigenval[idx]
     eigenvec = eigenvec[:, idx]
-    logger.debug('Getting the first k-eigenvectors')
+    logger.debug('Getting the first k-eigenvectors and values')
+    k_eigenval = eigenval[:k]
     k_eigenvec = eigenvec[:, :k]
 
-    return k_eigenvec
+    return k_eigenval, k_eigenvec
 
 
 def cluster_k_means(k_eig, k, logger):
@@ -185,7 +188,7 @@ if __name__ == '__main__':
     # Get Laplacian, eigenvalues and eigenvectors of it
     L, eigenval, eigenvec = laplacian_and_eigenvalues(G, logger)
     # Get only the first k eigenvectors
-    k_eigenvec = get_k_eigenvectors(eigenval, eigenvec, G_meta['k'], logger)
+    k_eigenval, k_eigenvec = get_k_eigenvectors(eigenval, eigenvec, G_meta['k'], logger)
     logger.debug("Shape of eigenvector matrix: %s" % (k_eigenvec.shape, ))
     end_eigh = time.time()
 
@@ -195,8 +198,10 @@ if __name__ == '__main__':
     end_eigsh = time.time()
 
     logger.debug('Execution time eigh. Elapsed time: %d sec' % (end_eigh - start_eigh))
+    logger.debug(k_eigenval)
     logger.debug(k_eigenvec)
     logger.debug('Execution time eigsh. Elapsed time: %d sec' % (end_eigsh - end_eigh))
+    logger.debug(keigenval)
     logger.debug(keigenvec)
 
     # Cluster using k-means
