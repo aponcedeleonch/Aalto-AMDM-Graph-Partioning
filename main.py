@@ -76,7 +76,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, logger, normalized=False):
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
     if (normalized):
         logger.debug('Normalizing eigenvec matrix')
-        eigenvec = normalize(eigenvec, axis=1, norm='l1')
+        eigenvec = normalize(eigenvec, axis=1, norm='l2')
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
 
@@ -116,7 +116,7 @@ def score_function(clustered, k, G, logger):
     logger.debug('Ideal score for clustering: %.10f' % (ideal_score))
     logger.debug('Getting score for the clustering')
     k_score = []
-    # Iterate over the k clusters
+    # Iterate over the k clusters 
     for i in range(k):
         # Get the nodes that were classified as the cluster k
         indexes = np.where(clustered == i)[0]
@@ -137,7 +137,6 @@ def score_function(clustered, k, G, logger):
         logger.debug('Cluster: %d. Edges cutting clusters: %d' % (i, edge_diff_cluster))
         logger.debug('Cluster: %d. Score: %.10f' % (i, cluster_score))
         k_score.append(cluster_score)
-
     return sum(k_score)
 
 
