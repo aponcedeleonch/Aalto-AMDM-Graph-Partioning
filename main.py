@@ -165,6 +165,8 @@ if __name__ == '__main__':
         graph_file_content = file.read()
     # Get a graph object from the file content
     G_meta, G = get_graph(graph_file_content, logger)
+    logger.debug("Number of nodes: %d" % (G.number_of_nodes()))
+    logger.debug("Number of edges: %d" % (G.number_of_edges()))
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], logger, normalized)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
