@@ -8,6 +8,10 @@ import time
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import normalize
 from scipy import sparse
+import os
+
+
+OUT_FOLDER = './outputs'
 
 
 # Parse script arguments
@@ -66,7 +70,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, logger, normalized=False):
         logger.debug('Getting Normalized Laplacian matrix')
         L = nx.normalized_laplacian_matrix(G)
     else:
-        logger.debug('Getting Laplacian matrix')        
+        logger.debug('Getting Laplacian matrix')
         L = nx.laplacian_matrix(G)
     L_double = L.asfptype()
     # Get the eigenvalues and eigenvectors
@@ -116,7 +120,7 @@ def score_function(clustered, k, G, logger):
     logger.debug('Ideal score for clustering: %.10f' % (ideal_score))
     logger.debug('Getting score for the clustering')
     k_score = []
-    # Iterate over the k clusters 
+    # Iterate over the k clusters
     for i in range(k):
         # Get the nodes that were classified as the cluster k
         indexes = np.where(clustered == i)[0]
@@ -174,8 +178,10 @@ if __name__ == '__main__':
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
+    os.makedirs(OUT_FOLDER, exist_ok=True)
+    out_path = OUT_FOLDER + '/' + out_name
     logger.debug('Writing results to file: %s' % (out_name))
-    with open(out_name, 'w') as file:
+    with open(out_path, 'w') as file:
         file.write(out_str)
     end_time = time.time()
     logger.debug('Finished execution. Elapsed time: %.10f sec' % (end_time - start_time))
