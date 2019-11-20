@@ -66,7 +66,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, logger, normalized=False):
         logger.debug('Getting Normalized Laplacian matrix')
         L = nx.normalized_laplacian_matrix(G)
     else:
-        logger.debug('Getting Laplacian matrix')        
+        logger.debug('Getting Laplacian matrix')
         L = nx.laplacian_matrix(G)
     L_double = L.asfptype()
     # Get the eigenvalues and eigenvectors
@@ -116,7 +116,7 @@ def score_function(clustered, k, G, logger):
     logger.debug('Ideal score for clustering: %.10f' % (ideal_score))
     logger.debug('Getting score for the clustering')
     k_score = []
-    # Iterate over the k clusters 
+    # Iterate over the k clusters
     for i in range(k):
         # Get the nodes that were classified as the cluster k
         indexes = np.where(clustered == i)[0]
