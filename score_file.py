@@ -7,7 +7,7 @@ import networkx as nx
 import numpy as np
 
 
-def parse_args(graph_names, args=sys.argv[1:]):
+def parse_args(args=sys.argv[1:]):
     parser = argparse.ArgumentParser()
     # Argument to print to console
     parser.add_argument("--log", "-l",
@@ -21,11 +21,6 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--output", "-o",
                         type=str, help="Name of output file to calculate the score",
                         required=True)
-    # Needs a graph to execute this script
-    parser.add_argument("--graph", "-g",
-                        type=str, required=True,
-                        help="Graph to execute the algorithm",
-                        choices=graph_names)
     return parser.parse_args(args)
 
 
@@ -107,9 +102,10 @@ def get_output_labels(out_file, logger):
         'edges': int(file_header[3]),
         'k': int(file_header[4])
     }
+    logger.debug('Going to get score for graph: %s' % (out_meta['name']))
 
     # Construct the graph with the rest of lines
-    logger.debug('Getting clusters for nodes')
+    logger.debug('Getting the clusters of the nodes')
     cluster_graph = lines[1:]
     cluster_graph = [line.split(' ') for line in cluster_graph]
     cluster_label = []
@@ -122,7 +118,7 @@ def get_output_labels(out_file, logger):
 if __name__ == '__main__':
     start_time = time.time()
     # Read arguments from console
-    args = parse_args(list(graphs_files.keys()))
+    args = parse_args()
     # Get a logger of the events
     numeric_log_level = getattr(logging, args.log, None)
     logging.basicConfig(
@@ -136,16 +132,16 @@ if __name__ == '__main__':
     )
     logger = logging.getLogger()
     logger.debug('Logger ready. Logging to file: %s' % (args.file))
+    header_out, cluster_labels = get_output_labels(args.output, logger)
     # Read from the text file
-    logger.debug('Reading graph from file: %s' % (graphs_files[args.graph]))
+    logger.debug('Reading graph from file: %s' % (graphs_files[header_out['name']]))
     graph_file_content = ''
-    with open(graphs_files[args.graph], 'r') as file:
+    with open(graphs_files[header_out['name']], 'r') as file:
         graph_file_content = file.read()
     # Get a graph object from the file content
     G_meta, G = get_graph(graph_file_content, logger)
     logger.debug("Number of nodes: %d" % (G.number_of_nodes()))
     logger.debug("Number of edges: %d" % (G.number_of_edges()))
-    header_out, cluster_labels = get_output_labels(args.output, logger)
     score = score_function(cluster_labels, G_meta['k'], G, logger)
     logger.debug('Score obtained from clustering: %.10f' % (score))
     end_time = time.time()
