@@ -8,6 +8,10 @@ import time
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import normalize
 from scipy import sparse
+import os
+
+
+OUT_FOLDER = './outputs'
 
 
 # Parse script arguments
@@ -174,8 +178,10 @@ if __name__ == '__main__':
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
+    os.makedirs(OUT_FOLDER, exist_ok=True)
+    out_path = OUT_FOLDER + '/' + out_name
     logger.debug('Writing results to file: %s' % (out_name))
-    with open(out_name, 'w') as file:
+    with open(out_path, 'w') as file:
         file.write(out_str)
     end_time = time.time()
     logger.debug('Finished execution. Elapsed time: %.10f sec' % (end_time - start_time))
