@@ -78,6 +78,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, normalized, logger):
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
+    print(eigenval)
     if (normalized):
         logger.debug('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
@@ -87,7 +88,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, normalized, logger):
 
 def cluster_k_means(k_eig, k, logger):
     logger.debug('Using k-means to cluster the vertices')
-    kmeans = KMeans(n_clusters=k, init='random').fit(k_eig)
+    kmeans = KMeans(n_clusters=k).fit(k_eig)
     logger.debug('K-means finished. Returning the results')
     return kmeans.labels_
 
