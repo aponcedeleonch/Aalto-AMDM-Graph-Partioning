@@ -36,7 +36,7 @@ Available options
 
 | Graph | Vertices | Edges | k |
 | ------ | ------ | ------ | ------ |
-| kosta | 5 | 6 | 2 |
+| dummy | 12 | 12 | 2 |
 | ca-GrQc | 4158 | 13428 | 2 |
 | ca-HepTh | 8638 | 24827 | 20 |
 | Oregon-1 | 10670 | 22002 | 5 |
@@ -68,6 +68,7 @@ $ python main.py -h
 
 Links to useful documentation
 
+* [Normalized cuts and image segmentation](https://www.cis.upenn.edu/~jshi/papers/pami_ncut.pdf)
 * [Balanced k-Means and Min-Cut Clustering](https://arxiv.org/abs/1411.6235)
 * [Balanced K-Means for Clustering](https://link.springer.com/chapter/10.1007/978-3-662-44415-3_4)
 * [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf)

@@ -66,7 +66,7 @@ def get_graph(graph_file, logger):
 
 def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
     # Get the Laplacian matrix from the graph
-    if(algo == 'NormLap'):
+    if(algo == 'NormLap' or algo == 'NormEig'):
         logger.debug('Getting Normalized Laplacian matrix')
         L = nx.normalized_laplacian_matrix(G)
     else:
@@ -77,7 +77,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
     logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
-    eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
+    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM',k=k)
     if (algo == 'NormEig'):
         logger.debug('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
@@ -87,7 +87,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
 
 def cluster_k_means(k_eig, k, logger):
     logger.debug('Using k-means to cluster the vertices')
-    kmeans = KMeans(n_clusters=k, init='random').fit(k_eig)
+    kmeans = KMeans(n_clusters=k).fit(k_eig)
     logger.debug('K-means finished. Returning the results')
     return kmeans.labels_
 
