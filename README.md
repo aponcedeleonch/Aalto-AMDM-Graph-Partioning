@@ -70,7 +70,7 @@ Links to useful documentation
 
 * [Balanced k-Means and Min-Cut Clustering](https://arxiv.org/abs/1411.6235)
 * [Balanced K-Means for Clustering](https://link.springer.com/chapter/10.1007/978-3-662-44415-3_4)
-*[New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf)
+* [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf)
 * [Graph Cuts and Normalized Cuts](http://www.dccia.ua.es/~sco/Spectral/Lesson3_Cuts.pdf)
 * [Graph Clustering](http://cs-people.bu.edu/evimaria/cs565/lect19-20.pdf)
 * [A Tutorial on Spectral Clustering](http://ranger.uta.edu/~chqding/Spectral/spectralA.pdf)
