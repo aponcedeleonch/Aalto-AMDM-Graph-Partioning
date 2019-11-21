@@ -60,7 +60,7 @@ def get_graph(graph_file, logger):
     return graph_meta, G
 
 
-def laplacian_and_k_eigenval_eigenvec(G, k, logger, normalized=False):
+def laplacian_and_k_eigenval_eigenvec(G, k, normalized, logger):
     # Get the Laplacian matrix from the graph
     if(normalized):
         logger.debug('Getting Normalized Laplacian matrix')
@@ -83,7 +83,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, logger, normalized=False):
 
 def cluster_k_means(k_eig, k, logger):
     logger.debug('Using k-means to cluster the vertices')
-    kmeans = KMeans(n_clusters=k).fit(k_eig)
+    kmeans = KMeans(n_clusters=k, init='random').fit(k_eig)
     logger.debug('K-means finished. Returning the results')
     return kmeans.labels_
 
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     logger.debug("Number of nodes: %d" % (G.number_of_nodes()))
     logger.debug("Number of edges: %d" % (G.number_of_edges()))
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], logger, normalized)
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], normalized, logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
