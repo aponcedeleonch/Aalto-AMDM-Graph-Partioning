@@ -8,7 +8,7 @@ graphs_files = {
     'roadNet-CA': 'graphs_processed/roadNet-CA.txt',
     'soc-Epinions1': 'graphs_processed/soc-Epinions1.txt',
     'web-NotreDame': 'graphs_processed/web-NotreDame.txt',
-    'kosta': 'graphs_processed/kosta.txt'
+    'dummy': 'graphs_processed/dummy.txt'
 }
 
 algorithms = ["Unorm", 'NormLap', 'NormEig']
