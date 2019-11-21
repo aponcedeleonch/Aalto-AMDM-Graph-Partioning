@@ -26,8 +26,7 @@ def parse_args(args=sys.argv[1:]):
 
 def score_function(clustered, k, G, logger):
     equal_partition = G.number_of_nodes()/k
-    ideal_score = (1/equal_partition)*k
-    logger.debug('Ideal score for clustering: %.10f' % (ideal_score))
+    logger.debug('Ideal balanced clusters: %.10f' % (equal_partition))
     logger.debug('Getting score for the clustering')
     k_score = []
     # Iterate over the k clusters
