@@ -1,4 +1,4 @@
-from graph_filenames import graphs_files
+from resources import graphs_files
 import sys
 import argparse
 import logging
