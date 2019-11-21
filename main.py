@@ -1,4 +1,4 @@
-from graph_filenames import graphs_files
+from resources import graphs_files, algorithms
 import sys
 import argparse
 import networkx as nx
@@ -22,10 +22,10 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         type=str, required=True,
                         help="Graph to execute the algorithm",
                         choices=graph_names)
-    # Normalize version of the script
-    parser.add_argument("--norm", "-n",
-                        type=str, help="Indicate normalization",
-                        default="False")
+    # Use different algorithms to run the script
+    parser.add_argument("--algo", "-a",
+                        type=str, help="Indicate normalization", default="Unorm",
+                        choices=algorithms)
     # Argument to print to console
     parser.add_argument("--log", "-l",
                         type=str, help="Set logging level", default="DEBUG",
@@ -64,9 +64,9 @@ def get_graph(graph_file, logger):
     return graph_meta, G
 
 
-def laplacian_and_k_eigenval_eigenvec(G, k, normalized, logger):
+def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
     # Get the Laplacian matrix from the graph
-    if(normalized):
+    if(algo == 'NormLap'):
         logger.debug('Getting Normalized Laplacian matrix')
         L = nx.normalized_laplacian_matrix(G)
     else:
@@ -78,7 +78,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, normalized, logger):
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, k=k)
-    if (normalized):
+    if (algo == 'NormEig'):
         logger.debug('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
@@ -163,7 +163,6 @@ if __name__ == '__main__':
     logger.debug('Logger ready. Logging to file: %s' % (args.file))
     # Read from the text file
     logger.debug('Reading graph from file: %s' % (graphs_files[args.graph]))
-    normalized = (args.norm in ['true', 't', 'True', 'T'])
     graph_file_content = ''
     with open(graphs_files[args.graph], 'r') as file:
         graph_file_content = file.read()
@@ -172,7 +171,7 @@ if __name__ == '__main__':
     logger.debug("Number of nodes: %d" % (G.number_of_nodes()))
     logger.debug("Number of edges: %d" % (G.number_of_edges()))
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], normalized, logger)
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], args.algo, logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)

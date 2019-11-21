@@ -10,3 +10,5 @@ graphs_files = {
     'web-NotreDame': 'graphs_processed/web-NotreDame.txt',
     'kosta': 'graphs_processed/kosta.txt'
 }
+
+algorithms = ["Unorm", 'NormLap', 'NormEig']
