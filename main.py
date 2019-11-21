@@ -77,7 +77,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
     logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
-    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM',k=k)
+    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k)
     if (algo == 'NormEig'):
         logger.debug('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
