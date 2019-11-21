@@ -36,7 +36,7 @@ Available options
 
 | Graph | Vertices | Edges | k |
 | ------ | ------ | ------ | ------ |
-| kosta | 5 | 6 | 2 |
+| dummy | 12 | 12 | 2 |
 | ca-GrQc | 4158 | 13428 | 2 |
 | ca-HepTh | 8638 | 24827 | 20 |
 | Oregon-1 | 10670 | 22002 | 5 |
