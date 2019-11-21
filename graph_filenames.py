@@ -7,5 +7,6 @@ graphs_files = {
     'Oregon-1': 'graphs_processed/Oregon-1.txt',
     'roadNet-CA': 'graphs_processed/roadNet-CA.txt',
     'soc-Epinions1': 'graphs_processed/soc-Epinions1.txt',
-    'web-NotreDame': 'graphs_processed/web-NotreDame.txt'
+    'web-NotreDame': 'graphs_processed/web-NotreDame.txt',
+    'kosta': 'graphs_processed/kosta.txt'
 }
