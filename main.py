@@ -64,9 +64,9 @@ def get_graph(graph_file, logger):
     return graph_meta, G
 
 
-def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
+def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     # Get the Laplacian matrix from the graph
-    if(algo == 'NormLap' or algo == 'NormEig'):
+    if('norm' in norm_decide):
         logger.debug('Getting Normalized Laplacian matrix')
         L = nx.normalized_laplacian_matrix(G)
     else:
@@ -78,7 +78,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, algo, logger):
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k)
-    if (algo == 'NormEig'):
+    if (norm_decide == 'norm_eig'):
         logger.debug('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
     logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
@@ -143,6 +143,49 @@ def score_function(clustered, k, G, logger):
     return sum(k_score)
 
 
+def unorm(G, k, logger):
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'u', logger)
+    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    # Cluster using k-means
+    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+
+    return cluster_labels
+
+
+def norm_lap(G, k, logger):
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm_lap', logger)
+    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    # Cluster using k-means
+    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+
+    return cluster_labels
+
+
+def norm_eig(G, k, logger):
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm_eig', logger)
+    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    # Cluster using k-means
+    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+
+    return cluster_labels
+
+
+def run_algorithm(G, k, algo, logger):
+    logger.debug('Going to execute algorithm: %s' % (algo))
+    if (algo == 'Unorm'):
+        cluster_labels = unorm(G, k, logger)
+    elif (algo == 'NormLap'):
+        cluster_labels = norm_lap(G, k, logger)
+    elif(algo == 'NormEig'):
+        cluster_labels = norm_eig(G, k, logger)
+    logger.debug('Algorithm execution finished: %s' % (algo))
+
+    return cluster_labels
+
+
 if __name__ == '__main__':
     start_time = time.time()
     # Read arguments from console
@@ -169,11 +212,9 @@ if __name__ == '__main__':
     G_meta, G = get_graph(graph_file_content, logger)
     logger.debug("Number of nodes: %d" % (G.number_of_nodes()))
     logger.debug("Number of edges: %d" % (G.number_of_edges()))
-    # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], args.algo, logger)
-    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
-    # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+
+    cluster_labels = run_algorithm(G, G_meta['k'], args.algo, logger)
+
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
     os.makedirs(OUT_FOLDER, exist_ok=True)
