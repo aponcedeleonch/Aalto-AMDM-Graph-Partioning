@@ -37,15 +37,15 @@ Available options
 | Graph | Vertices | Edges | k |
 | ------ | ------ | ------ | ------ |
 | kosta | 5 | 6 | 2 |
-| ca-AstroPh | 17903 | 197031 | 50 |
-| ca-CondMat | 21363 | 91342 | 100 |
 | ca-GrQc | 4158 | 13428 | 2 |
-| ca-HepPh | 11204 | 117649 | 25 |
 | ca-HepTh | 8638 | 24827 | 20 |
 | Oregon-1 | 10670 | 22002 | 5 |
-| roadNet-CA | 1957027 | 2760388 | 50 |
+| ca-HepPh | 11204 | 117649 | 25 |
+| ca-AstroPh | 17903 | 197031 | 50 |
+| ca-CondMat | 21363 | 91342 | 100 |
 | soc-Epinions1 | 75879 | 405740 | 10 |
 | web-NotreDame | 325729 | 1117563 | 20 |
+| roadNet-CA | 1957027 | 2760388 | 50 |
 
 Example
 
