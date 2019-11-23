@@ -87,6 +87,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
 
 def cluster_k_means(k_eig, k, logger):
     logger.debug('Using k-means to cluster the vertices')
+    #print(k_eig[:,1])
     kmeans = KMeans(n_clusters=k).fit(k_eig)
     logger.debug('K-means finished. Returning the results')
     return kmeans.labels_
