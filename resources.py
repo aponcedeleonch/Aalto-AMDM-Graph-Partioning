@@ -11,4 +11,4 @@ graphs_files = {
     'dummy': 'graphs_processed/dummy.txt'
 }
 
-algorithms = ["Unorm", 'NormLap', 'NormEig','Recursive']
+algorithms = ["Unorm", 'NormLap', 'NormEig', 'HagenKahng','Recursive']

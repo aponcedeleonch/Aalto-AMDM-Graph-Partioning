@@ -28,7 +28,7 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         choices=algorithms)
     # Argument to print to console
     parser.add_argument("--log", "-l",
-                        type=str, help="Set logging level", default="DEBUG",
+                        type=str, help="Set logging level", default="INFO",
                         choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
     # Argument to name the log file
     parser.add_argument("--file", "-f",
@@ -38,7 +38,7 @@ def parse_args(graph_names, args=sys.argv[1:]):
 
 
 def get_graph(graph_file, logger):
-    logger.debug('Parsing graph file')
+    logger.info('Parsing graph file')
     # Get file lines into list
     lines = graph_file.split("\n")
     # Remove empty lines from list
@@ -55,7 +55,7 @@ def get_graph(graph_file, logger):
     }
 
     # Construct the graph with the rest of lines
-    logger.debug('Constructing graph')
+    logger.info('Constructing graph')
     file_graph = lines[1:]
     file_graph = [line.split(' ') for line in file_graph]
     G = nx.Graph()
@@ -67,34 +67,33 @@ def get_graph(graph_file, logger):
 def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     # Get the Laplacian matrix from the graph
     if('norm' in norm_decide):
-        logger.debug('Getting Normalized Laplacian matrix')
+        logger.info('Getting Normalized Laplacian matrix')
         L = nx.normalized_laplacian_matrix(G)
     else:
-        logger.debug('Getting Laplacian matrix')
+        logger.info('Getting Laplacian matrix')
         L = nx.laplacian_matrix(G)
     L_double = L.asfptype()
     # Get the eigenvalues and eigenvectors
-    logger.debug('Getting eigenvalues and eigenvectors of Laplacian')
+    logger.info('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k)
     if (norm_decide == 'norm_eig'):
-        logger.debug('Normalizing eigenvec matrix')
+        logger.info('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
-    logger.debug('Finished. Returning eigenvalues, eigenvectors and Laplacian')
+    logger.info('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
 
 
 def cluster_k_means(k_eig, k, logger):
-    logger.debug('Using k-means to cluster the vertices')
-    #print(k_eig[:,1])
+    logger.info('Using k-means to cluster the vertices')
     kmeans = KMeans(n_clusters=k).fit(k_eig)
-    logger.debug('K-means finished. Returning the results')
+    logger.info('K-means finished. Returning the results')
     return kmeans.labels_
 
 
 def output_file(g_meta, clustered, logger):
-    logger.debug('Preparing string to write output file')
+    logger.info('Preparing string to write output file')
     # Prepare the header of the output file
     header = '# %s %d %d %d\n' % (
                                     g_meta['name'],
@@ -112,7 +111,45 @@ def output_file(g_meta, clustered, logger):
     str_time = time.strftime("%m-%d-%Y_%H_%M", time.localtime())
     out_name = '%s_output_%s.txt' % (g_meta['name'], str_time)
 
+    logger.info('Returning string to write output file')
+
     return out_name, header + cluster_str
+
+
+def hagen_kahng_ratio_cut(eigv_2, G, logger):
+    logger.info('Executing Hagen Kahng algorithm')
+    logger.debug('Sorting second eigenvector')
+    # Getting the indexes for sorting the second eigenvector
+    ordered_eigv = np.argsort(eigv_2)
+    logger.debug(eigv_2[ordered_eigv])
+    # Initialize an array to keep the results for every cut
+    r_results = np.zeros(G.number_of_nodes()-1)
+    # Make all possible cuts over the second eigenvector
+    for i in range(len(r_results)):
+        # Putting i nodes in the first cluster
+        cluster_1_num = i+1
+        # Putting V-i nodes in the second cluster
+        cluster_2_num = G.number_of_nodes()-cluster_1_num
+        logger.debug('Iteration of Hagen Kahng: %d' % (i))
+        logger.debug('Nodes in Cluster 1: %d' % (cluster_1_num))
+        logger.debug('Nodes in Cluster 2: %d' % (cluster_2_num))
+        cluster_1 = np.zeros(cluster_1_num)
+        cluster_2 = np.ones(cluster_2_num)
+        clustered = np.append(cluster_1, cluster_2)
+        # Ordering the cut according to the ordered eigenvector
+        clustered = clustered[ordered_eigv]
+        # Getting the score for that cut
+        r_results[i] = score_function(clustered, k=2, G=G, logger=logger)
+        logger.debug('Scoring function results: %.10f' % (r_results[i]))
+    # Get the best score from all the cuts
+    ideal_cut = np.argmin(r_results) + 1
+    # Constructing again the way the cut was made
+    clustered = np.append(np.zeros(ideal_cut), np.ones(G.number_of_nodes()-ideal_cut))
+    clustered = clustered[ordered_eigv]
+    logger.info('Best scoring function found Hagen Kahng: %.10f' % (r_results[ideal_cut-1]))
+    logger.info('Cluster 1 size: %d' % (ideal_cut))
+    logger.info('Cluster 2 size: %d' % (G.number_of_nodes()-ideal_cut))
+    return clustered
 
 
 def score_function(clustered, k, G, logger):
@@ -146,18 +183,26 @@ def score_function(clustered, k, G, logger):
 
 def unorm(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'u', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    logger.debug('K-Eigenvectors')
+    logger.debug(k_eigenvec)
+    logger.debug('K-Eigenvalues')
+    logger.debug(k_eigenval)
     # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+    cluster_labels = cluster_k_means(k_eigenvec, k, logger)
 
     return cluster_labels
 
 
 def norm_lap(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    logger.debug('K-Eigenvectors')
+    logger.debug(k_eigenvec)
+    logger.debug('K-Eigenvalues')
+    logger.debug(k_eigenval)
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
     return cluster_labels
@@ -165,8 +210,12 @@ def norm_lap(G, k, logger):
 
 def norm_eig(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm_eig', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm_eig', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    logger.debug('K-Eigenvectors')
+    logger.debug(k_eigenvec)
+    logger.debug('K-Eigenvalues')
+    logger.debug(k_eigenval)
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
 
@@ -203,8 +252,30 @@ def recursive(G, k, c, logger):
     c[k-1] = list(G)
     return c
 
+def hagen_kahng(G, k, logger):
+    # Throws an execption if k!=2
+    if k != 2:
+        raise ValueError(('Hagen Kahng algorithm only works with k=2.'
+                          'Trying to execute k=%d') % (k))
+    # Get the Unormalized Laplacian matrix
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
+    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    logger.debug('K-Eigenvectors')
+    logger.debug(k_eigenvec)
+    logger.debug('K-Eigenvalues')
+    logger.debug(k_eigenval)
+    # Getting only the second eigenvector
+    logger.info("Getting only second eigenvector")
+    eigv_2 = k_eigenvec[:, 1]
+    logger.debug(eigv_2)
+    # Executing the Hagen Kahng algorithm
+    cluster_labels = hagen_kahng_ratio_cut(eigv_2, G, logger)
+
+    return cluster_labels
+
+
 def run_algorithm(G, k, algo, logger):
-    logger.debug('Going to execute algorithm: %s' % (algo))
+    logger.info('Going to execute algorithm: %s' % (algo))
     if (algo == 'Unorm'):
         cluster_labels = unorm(G, k, logger)
     elif (algo == 'NormLap'):
@@ -222,7 +293,9 @@ def run_algorithm(G, k, algo, logger):
                 np_labels[int(j)]=i
         #print(np_labels)
         cluster_labels = np_labels
-    logger.debug('Algorithm execution finished: %s' % (algo))
+    elif(algo == 'HagenKahng'):
+        cluster_labels = hagen_kahng(G, k, logger)
+    logger.info('Algorithm execution finished: %s' % (algo))
 
     return cluster_labels
 
@@ -243,16 +316,16 @@ if __name__ == '__main__':
         ]
     )
     logger = logging.getLogger()
-    logger.debug('Logger ready. Logging to file: %s' % (args.file))
+    logger.info('Logger ready. Logging to file: %s' % (args.file))
     # Read from the text file
-    logger.debug('Reading graph from file: %s' % (graphs_files[args.graph]))
+    logger.info('Reading graph from file: %s' % (graphs_files[args.graph]))
     graph_file_content = ''
     with open(graphs_files[args.graph], 'r') as file:
         graph_file_content = file.read()
     # Get a graph object from the file content
     G_meta, G = get_graph(graph_file_content, logger)
-    logger.debug("Number of nodes: %d" % (G.number_of_nodes()))
-    logger.debug("Number of edges: %d" % (G.number_of_edges()))
+    logger.info("Number of nodes: %d" % (G.number_of_nodes()))
+    logger.info("Number of edges: %d" % (G.number_of_edges()))
 
     cluster_labels = run_algorithm(G, G_meta['k'], args.algo, logger)
 
@@ -260,12 +333,12 @@ if __name__ == '__main__':
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
     os.makedirs(OUT_FOLDER, exist_ok=True)
     out_path = OUT_FOLDER + '/' + out_name
-    logger.debug('Writing results to file: %s' % (out_name))
+    logger.info('Writing results to file: %s' % (out_name))
     with open(out_path, 'w') as file:
         file.write(out_str)
     end_time = time.time()
-    logger.debug('Finished execution. Elapsed time: %.10f sec' % (end_time - start_time))
+    logger.info('Finished execution. Elapsed time: %.10f sec' % (end_time - start_time))
     score = score_function(cluster_labels, G_meta['k'], G, logger)
-    logger.debug('Score obtained from clustering: %.10f' % (score))
+    logger.info('Score obtained from clustering: %.10f' % (score))
     end_time_score = time.time()
-    logger.debug('Finished score execution. Elapsed time: %.10f sec' % (end_time_score - end_time))
+    logger.info('Finished score execution. Elapsed time: %.10f sec' % (end_time_score - end_time))

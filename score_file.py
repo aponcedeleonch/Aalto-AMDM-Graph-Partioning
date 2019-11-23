@@ -29,24 +29,25 @@ def score_function(clustered, k, G, logger):
     logger.debug('Ideal balanced clusters: %.10f' % (equal_partition))
     logger.debug('Getting score for the clustering')
     k_score = []
+    if len(clustered.keys()) != k:
+        logger.error('Different number of clusters in output file than k')
+        return 0
     # Iterate over the k clusters
     for i in range(k):
         # Get the nodes that were classified as the cluster k
-        indexes = np.where(clustered == i)[0]
-        cluster_size = len(indexes)
-        logger.debug('Cluster: %d. Number of nodes: %d' % (i, cluster_size))
+        nodes_in_k = clustered[i]
+        logger.debug('Cluster: %d. Number of nodes: %d' % (i, len(nodes_in_k)))
+        nodes_in_k = np.array(nodes_in_k)
         edge_diff_cluster = 0
         # Iterate over the nodes in cluster k
-        for idx in indexes:
-            node_cluster = clustered[idx]
+        for node in nodes_in_k:
             # Iterate over the neighbors of the node
-            for neigh in G[str(idx)]:
-                neigh_cluster = clustered[int(neigh)]
+            for neigh in G[str(node)]:
                 # Check if the neighbor is in the same cluster as current node
-                if node_cluster != neigh_cluster:
+                if np.where(nodes_in_k == int(neigh))[0].size == 0:
                     edge_diff_cluster += 1
         # Get the score for the cluster k. Store it
-        cluster_score = edge_diff_cluster/cluster_size
+        cluster_score = edge_diff_cluster/len(nodes_in_k)
         logger.debug('Cluster: %d. Edges cutting clusters: %d' % (i, edge_diff_cluster))
         logger.debug('Cluster: %d. Score: %.10f' % (i, cluster_score))
         k_score.append(cluster_score)
@@ -107,11 +108,15 @@ def get_output_labels(out_file, logger):
     logger.debug('Getting the clusters of the nodes')
     cluster_graph = lines[1:]
     cluster_graph = [line.split(' ') for line in cluster_graph]
-    cluster_label = []
+    cluster_label = {}
     for cluster_line in cluster_graph:
-        cluster_label.append(int(cluster_line[1]))
+        cluster = int(cluster_line[1])
+        if cluster in cluster_label:
+            cluster_label[cluster].append(int(cluster_line[0]))
+        else:
+            cluster_label[cluster] = [int(cluster_line[0])]
 
-    return out_meta, np.array(cluster_label)
+    return out_meta, cluster_label
 
 
 if __name__ == '__main__':
