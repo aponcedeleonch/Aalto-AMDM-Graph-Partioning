@@ -77,7 +77,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     logger.info('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
-    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k)
+    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k, ncv=10)
     if (norm_decide == 'norm_eig'):
         logger.info('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
@@ -109,7 +109,7 @@ def output_file(g_meta, clustered, logger):
 
     # Constructing the output filename
     str_time = time.strftime("%m-%d-%Y_%H_%M", time.localtime())
-    out_name = '%s_output_%s.txt' % (g_meta['name'], str_time)
+    out_name = '%s_%s.output' % (g_meta['name'], str_time)
 
     logger.info('Returning string to write output file')
 
@@ -258,7 +258,7 @@ def hagen_kahng(G, k, logger):
         raise ValueError(('Hagen Kahng algorithm only works with k=2.'
                           'Trying to execute k=%d') % (k))
     # Get the Unormalized Laplacian matrix
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)

@@ -70,12 +70,12 @@ $ python main.py -h
 | Graph | NormLap | NormEig | Recursive |
 |---------------|---------|---------|-----------|
 | ca-GrQc | ? | ? | 0.2305 |
-| ca-HepTh | 100.04 | ? | ? |
+| ca-HepTh | 100.04 | ? | 30.89 |
 | Oregon-1 | ? | ? | 5.74 |
-| ca-HepPh | ? | 494.67 | ? |
-| ca-AstroPh | ? | 208 | ? |
-| ca-CondMat | 207.45 | ? | ? |
-| soc-Epinions1 | ? | ? | ? |
+| ca-HepPh | ? | 494.67 | 51.484 |
+| ca-AstroPh | ? | ? | 208.42 |
+| ca-CondMat | ? | ? | ? |
+| soc-Epinions1 | ? | ? | 42.05 |
 | web-NotreDame | ? | ? | ? |
 | roadNet-CA | ? | ? | ? |
 
