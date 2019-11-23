@@ -11,6 +11,7 @@ Developed by:
 Links to libraries used during the realization of the project
 
 * [Graph](https://networkx.github.io/documentation/networkx-2.4/reference/introduction.html#graphs) - For constructring graphs using NetworkX package in python
+* [Graph iteration and other methods](https://networkx.github.io/documentation/networkx-2.4/reference/classes/graph.html#methods) - For iterating graphs and other useful methods in networkx library
 * [Laplacian Matrix](https://networkx.github.io/documentation/networkx-2.4/reference/linalg.html#module-networkx.linalg.laplacianmatrix) - For getting the Laplacian matrix of the graph
 * [Eigenvalues and Eigenvectors](https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.eig.html) - For getting the Eigenvalues and Eigenvectors of the Laplacian Matrix. Numpy function.
 * [Eigenvalues and Eigenvectors of Real symmetric matrix](https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.eigh.html#numpy.linalg.eigh) - For getting the Eigenvalues and Eigenvectors of the Laplacian Matrix. Numpy function.
@@ -70,10 +71,10 @@ Links to useful documentation
 
 * [Normalized cuts and image segmentation](https://www.cis.upenn.edu/~jshi/papers/pami_ncut.pdf)
 * [Balanced k-Means and Min-Cut Clustering](https://arxiv.org/abs/1411.6235)
-* [Balanced K-Means for Clustering](https://link.springer.com/chapter/10.1007/978-3-662-44415-3_4)
-* [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf)
+* [Balanced K-Means for Clustering](https://link.springer.com/chapter/10.1007/978-3-662-44415-3_4) - Mikko I. Malinen and Pasi Fränti
+* [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf) - Lars Hagen and Andrew B. Kahng
 * [Graph Cuts and Normalized Cuts](http://www.dccia.ua.es/~sco/Spectral/Lesson3_Cuts.pdf)
 * [Graph Clustering](http://cs-people.bu.edu/evimaria/cs565/lect19-20.pdf)
-* [A Tutorial on Spectral Clustering](http://ranger.uta.edu/~chqding/Spectral/spectralA.pdf)
+* [A Tutorial on Spectral Clustering](http://ranger.uta.edu/~chqding/Spectral/spectralA.pdf) - Chris Ding
 * [Same-size k-Means Variation](https://elki-project.github.io/tutorial/same-size_k_means)
 * [Graph Clustering Using Ratio Cuts](https://www.cis.upenn.edu/~cis515/cis515-15-spectral-clust-chap5.pdf)
