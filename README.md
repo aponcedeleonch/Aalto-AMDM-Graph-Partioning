@@ -68,13 +68,12 @@ $ python main.py -h
 
 | Graph | Score | Method | Time |
 | ------ | ------ | ------ | ------ |
-| dummy | Inf | ? | ? |
-| ca-GrQc | Inf | ? | ? |
-| ca-HepTh | Inf | ? | ? |
-| Oregon-1 | Inf | ? | ? |
-| ca-HepPh | Inf | ? | ? |
-| ca-AstroPh | Inf | ? | ? |
-| ca-CondMat | Inf | ? | ? |
+| ca-GrQc | 0.2305117633 | Recursive | 0.0729565620 |
+| ca-HepTh | 100.0413225418 | NormLap | 1.158 |
+| Oregon-1 | 5.7486423212 | Recursive | 0.1019420624 |
+| ca-HepPh | 494.6745705868 | NormEig | 5.031 |
+| ca-AstroPh | 208 | NormEig | 85.46 |
+| ca-CondMat | 207.4571849994 | NormLap | 264.395 |
 | soc-Epinions1 | Inf | ? | ? |
 | web-NotreDame | Inf | ? | ? |
 | roadNet-CA | Inf | ? | ? |

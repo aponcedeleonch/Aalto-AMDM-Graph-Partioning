@@ -145,7 +145,7 @@ def score_function(clustered, k, G, logger):
 
 def unorm(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'u', logger)
+    _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'u', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
@@ -164,7 +164,7 @@ def norm_lap(G, k, logger):
 
 def norm_eig(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm_eig', logger)
+    _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm_eig', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
