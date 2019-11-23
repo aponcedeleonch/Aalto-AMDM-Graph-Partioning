@@ -64,6 +64,21 @@ To get some help on how to run the script
 ```sh
 $ python main.py -h
 ```
+### Best results
+
+| Graph | Score | Method | Time |
+| ------ | ------ | ------ | ------ |
+| dummy | Inf | ? | ? |
+| ca-GrQc | Inf | ? | ? |
+| ca-HepTh | Inf | ? | ? |
+| Oregon-1 | Inf | ? | ? |
+| ca-HepPh | Inf | ? | ? |
+| ca-AstroPh | Inf | ? | ? |
+| ca-CondMat | Inf | ? | ? |
+| soc-Epinions1 | Inf | ? | ? |
+| web-NotreDame | Inf | ? | ? |
+| roadNet-CA | Inf | ? | ? |
+
 ### Resources
 
 Links to useful documentation

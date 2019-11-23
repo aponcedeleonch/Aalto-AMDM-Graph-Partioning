@@ -155,11 +155,10 @@ def unorm(G, k, logger):
 
 def norm_lap(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm_lap', logger)
+    _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, G_meta['k'], 'norm', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     # Cluster using k-means
     cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
-
     return cluster_labels
 
 
@@ -172,6 +171,36 @@ def norm_eig(G, k, logger):
 
     return cluster_labels
 
+def recursive(G, k, c, logger):
+    if (k >= 2):
+        # Get Laplacian, 2 eigenvalues and eigenvectors
+        _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
+        logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+        # Cluster using k-means and the second smallest eigenvector
+        eigenvec_2 = k_eigenvec[:,1].reshape(-1,1)
+        cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+        # Nodes of the biggest cluster
+        logger.debug("Graph partition")
+        all_nodes = list(G)
+        n = len(all_nodes)
+        b_cluster = sum(cluster_labels)
+        print("K", k)
+        print("Total size: ", len(all_nodes))
+        print("One cluster size: ", b_cluster)
+        if (b_cluster > n/2):
+            indicator = 1
+            indicator2 = 0
+        else:
+            indicator = 0
+            indicator2 = 1
+        nodes = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator]
+        accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator2]
+        subgraph = G.subgraph(nodes)
+        c[k-1] = accepted_cluster
+        return recursive(subgraph, k-1, c, logger)
+        #return c
+    c[k-1] = list(G)
+    return c
 
 def run_algorithm(G, k, algo, logger):
     logger.debug('Going to execute algorithm: %s' % (algo))
@@ -181,6 +210,17 @@ def run_algorithm(G, k, algo, logger):
         cluster_labels = norm_lap(G, k, logger)
     elif(algo == 'NormEig'):
         cluster_labels = norm_eig(G, k, logger)
+    elif(algo == 'Recursive'):
+        #Empty dictionary to track  labels
+        c={}
+        cluster_labels = recursive(G, k, c ,logger)
+        #print(cluster_labels)
+        np_labels = np.zeros(len(list(G)))
+        for i in range(k):
+            for j in cluster_labels[i]:
+                np_labels[int(j)]=i
+        #print(np_labels)
+        cluster_labels = np_labels
     logger.debug('Algorithm execution finished: %s' % (algo))
 
     return cluster_labels
