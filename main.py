@@ -77,7 +77,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     logger.info('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
-    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k, ncv=10)
+    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k, ncv=5*k)
     if (norm_decide == 'norm_eig'):
         logger.info('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
@@ -204,7 +204,7 @@ def norm_lap(G, k, logger):
     logger.debug('K-Eigenvalues')
     logger.debug(k_eigenval)
     # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+    cluster_labels = cluster_k_means(k_eigenvec, k, logger)
     return cluster_labels
 
 
@@ -234,9 +234,7 @@ def recursive(G, k, c, logger):
         all_nodes = list(G)
         n = len(all_nodes)
         b_cluster = sum(cluster_labels)
-        print("K", k)
-        print("Total size: ", len(all_nodes))
-        print("One cluster size: ", b_cluster)
+        logger.debug('Remaining iterations: %d.' % (k-1))
         if (b_cluster > n/2):
             indicator = 1
             indicator2 = 0
@@ -286,12 +284,10 @@ def run_algorithm(G, k, algo, logger):
         #Empty dictionary to track  labels
         c={}
         cluster_labels = recursive(G, k, c ,logger)
-        #print(cluster_labels)
         np_labels = np.zeros(len(list(G)))
         for i in range(k):
             for j in cluster_labels[i]:
                 np_labels[int(j)]=i
-        #print(np_labels)
         cluster_labels = np_labels
     elif(algo == 'HagenKahng'):
         cluster_labels = hagen_kahng(G, k, logger)
