@@ -77,7 +77,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     logger.info('Getting eigenvalues and eigenvectors of Laplacian')
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
-    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k)
+    eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k, ncv=5*k)
     if (norm_decide == 'norm_eig'):
         logger.info('Normalizing eigenvec matrix')
         eigenvec = normalize(eigenvec, axis=1, norm='l2')
@@ -109,7 +109,7 @@ def output_file(g_meta, clustered, logger):
 
     # Constructing the output filename
     str_time = time.strftime("%m-%d-%Y_%H_%M", time.localtime())
-    out_name = '%s_output_%s.txt' % (g_meta['name'], str_time)
+    out_name = '%s_%s.output' % (g_meta['name'], str_time)
 
     logger.info('Returning string to write output file')
 
@@ -183,35 +183,34 @@ def score_function(clustered, k, G, logger):
 
 def unorm(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
     logger.debug('K-Eigenvalues')
     logger.debug(k_eigenval)
     # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+    cluster_labels = cluster_k_means(k_eigenvec, k, logger)
 
     return cluster_labels
 
 
 def norm_lap(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm_lap', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
     logger.debug('K-Eigenvalues')
     logger.debug(k_eigenval)
     # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
-
+    cluster_labels = cluster_k_means(k_eigenvec, k, logger)
     return cluster_labels
 
 
 def norm_eig(G, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm_eig', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm_eig', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
@@ -222,6 +221,34 @@ def norm_eig(G, k, logger):
 
     return cluster_labels
 
+def recursive(G, k, c, logger):
+    if (k >= 2):
+        # Get Laplacian, 2 eigenvalues and eigenvectors
+        _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
+        logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+        # Cluster using k-means and the second smallest eigenvector
+        eigenvec_2 = k_eigenvec[:,1].reshape(-1,1)
+        cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+        # Nodes of the biggest cluster
+        logger.debug("Graph partition")
+        all_nodes = list(G)
+        n = len(all_nodes)
+        b_cluster = sum(cluster_labels)
+        logger.debug('Remaining iterations: %d.' % (k-1))
+        if (b_cluster > n/2):
+            indicator = 1
+            indicator2 = 0
+        else:
+            indicator = 0
+            indicator2 = 1
+        nodes = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator]
+        accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator2]
+        subgraph = G.subgraph(nodes)
+        c[k-1] = accepted_cluster
+        return recursive(subgraph, k-1, c, logger)
+        #return c
+    c[k-1] = list(G)
+    return c
 
 def hagen_kahng(G, k, logger):
     # Throws an execption if k!=2
@@ -229,7 +256,7 @@ def hagen_kahng(G, k, logger):
         raise ValueError(('Hagen Kahng algorithm only works with k=2.'
                           'Trying to execute k=%d') % (k))
     # Get the Unormalized Laplacian matrix
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
+    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
@@ -253,6 +280,15 @@ def run_algorithm(G, k, algo, logger):
         cluster_labels = norm_lap(G, k, logger)
     elif(algo == 'NormEig'):
         cluster_labels = norm_eig(G, k, logger)
+    elif(algo == 'Recursive'):
+        #Empty dictionary to track  labels
+        c={}
+        cluster_labels = recursive(G, k, c ,logger)
+        np_labels = np.zeros(len(list(G)))
+        for i in range(k):
+            for j in cluster_labels[i]:
+                np_labels[int(j)]=i
+        cluster_labels = np_labels
     elif(algo == 'HagenKahng'):
         cluster_labels = hagen_kahng(G, k, logger)
     logger.info('Algorithm execution finished: %s' % (algo))
