@@ -132,7 +132,7 @@ def output_file(g_meta, clustered, logger):
         cluster_str += '%d %d\n' % (i, cluster)
 
     # Constructing the output filename
-    str_time = time.strftime("%m-%d-%Y_%H_%M", time.localtime())
+    str_time = time.strftime("%m-%d-%Y_%H_%M_%S", time.localtime())
     out_name = '%s_%s.output' % (g_meta['name'], str_time)
 
     logger.info('Returning string to write output file')
