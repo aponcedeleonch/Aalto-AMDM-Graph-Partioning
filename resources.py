@@ -12,5 +12,4 @@ graphs_files = {
 }
 
 algorithms = ['Unorm', 'NormLap', 'NormEig', 'HagenKahng', 'Recursive']
-clustering = ['Kmeans', 'Gmm']
-
+clustering = ['Kmeans', 'Gmm', 'Agglomerative']
