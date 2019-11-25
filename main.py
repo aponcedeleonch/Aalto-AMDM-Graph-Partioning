@@ -340,6 +340,7 @@ def hagen_kahng(G, k, logger):
     logger.info("Getting only second eigenvector")
     eigv_2 = k_eigenvec[:, 1]
     logger.debug(eigv_2)
+
     # Executing the Hagen Kahng algorithm
     cluster_labels = hagen_kahng_ratio_cut(eigv_2, G, logger)
 
