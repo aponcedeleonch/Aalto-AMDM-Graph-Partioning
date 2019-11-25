@@ -31,7 +31,7 @@ $ pip install requirements.txt
 ```
 ### Running
 
-The script requires a graph as argument to start running
+The script requires a graph as argument to start running and an algorithm
 
 Available options
 
@@ -48,10 +48,21 @@ Available options
 | web-NotreDame | 325729 | 1117563 | 20 |
 | roadNet-CA | 1957027 | 2760388 | 50 |
 
-Example
+Available algorithms:
+- Unorm - Use un-normalized Laplacian and k clusters
+- NormLap - Use normalized Laplacian and k clusters
+- NormEig - Use normalized Laplacian, normalized rows of eigenvector matrix and k clusters
+- HagenKahng - Only useful for k=2. Use only second eigenvector to cluster. Based on [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf) - Lars Hagen and Andrew B. Kahng
+- Recursive
 
 ```sh
-$ python main.py -g ca-GrQc
+$ python main.py -g <graph> -a <algorithm>
+```
+
+Example:
+
+```sh
+$ python main.py -g ca-GrQc -a Recursive
 ```
 
 Optionally also specify the logging level
@@ -65,19 +76,49 @@ To get some help on how to run the script
 ```sh
 $ python main.py -h
 ```
+
+There is also a bash script to run an algorithm over all of the graphs.
+
+```sh
+./execute_algorithm.sh <algorithm>
+```
+
+Example:
+
+```sh
+./execute_algorithm.sh Recursive
+```
+
 ### Preliminary results
 
-| Graph | NormLap | NormEig | Recursive |
-|---------------|---------|---------|-----------|
-| ca-GrQc | ? | ? | 0.2305 |
-| ca-HepTh | 100.04 | ? | 30.89 |
-| Oregon-1 | ? | ? | 5.74 |
-| ca-HepPh | ? | 494.67 | 51.484 |
-| ca-AstroPh | ? | ? | 208.42 |
-| ca-CondMat | ? | ? | ? |
-| soc-Epinions1 | ? | ? | 42.05 |
-| web-NotreDame | ? | ? | ? |
-| roadNet-CA | ? | ? | ? |
+| Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
+|---------------|---------|---------|---------|-----------|-----------|
+| ca-GrQc | 8.85 | ? | ? | 0.2305 | 2.00 |
+| ca-HepTh | 90.45 | 100.04 | ? | 30.89 | N/A |
+| Oregon-1 | 9.02 | ? | ? | 5.74 | N/A |
+| ca-HepPh | 508.41 | ? | 494.67 | 51.484 | N/A |
+| ca-AstroPh | 1180.08 | ? | ? | 208.42 | N/A |
+| ca-CondMat | 880.23 | ? | ? | ? | N/A |
+| soc-Epinions1 | ? | ? | ? | 42.05 | N/A |
+| web-NotreDame | ? | ? | ? | ? | N/A |
+| roadNet-CA | ? | ? | ? | ? | N/A |
+
+### Elapsed times
+
+Elapsed time for running each algorithm in each graph. In seconds
+
+| Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
+|---------------|---------|---------|---------|-----------|-----------|
+| ca-GrQc | 4.56 | ? | ? | ? | 87.10 |
+| ca-HepTh | 1.84 | ? | ? | ? | N/A |
+| Oregon-1 | 6.77 | ? | ? | ? | N/A |
+| ca-HepPh | 7.76 | ? | ? | ? | N/A |
+| ca-AstroPh | 236.41 | ? | ? | ? | N/A |
+| ca-CondMat | 389.92 | ? | ? | ? | N/A |
+| soc-Epinions1 | ? | ? | ? | ? | N/A |
+| web-NotreDame | ? | ? | ? | ? | N/A |
+| roadNet-CA | ? | ? | ? | ? | N/A |
+
 
 ### Resources
 
