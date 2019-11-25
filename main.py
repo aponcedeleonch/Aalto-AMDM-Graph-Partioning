@@ -207,7 +207,8 @@ def score_function(clustered, k, G, logger):
 
 def unorm(G, k, clustering, PCA, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'u', logger)
+    k_eigenvec = k_eigenvec[:, 1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
@@ -222,13 +223,24 @@ def unorm(G, k, clustering, PCA, logger):
     if (clustering == "Agglomerative"):
         # Cluster using agglomerative algorithm
         cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
+
+    cluster_labels = correct_cluster_labels(G, cluster_labels)
 
     return cluster_labels
 
 
+def correct_cluster_labels(G, cluster_labels):
+    all_nodes = list(G)
+    np_labels = np.zeros(len(all_nodes))
+    for i in range(len(all_nodes)):
+        np_labels[int(all_nodes[i])] = cluster_labels[i]
+    return np_labels
+
+
 def norm_lap(G, k, clustering, PCA, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm', logger)
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm', logger)
+    k_eigenvec = k_eigenvec[:,1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
@@ -243,12 +255,16 @@ def norm_lap(G, k, clustering, PCA, logger):
     if (clustering == "Agglomerative"):
         # Cluster using agglomerative algorithm
         cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
+
+    cluster_labels = correct_cluster_labels(G, cluster_labels)
+
     return cluster_labels
 
 
 def norm_eig(G, k, clustering, PCA, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm_eig', logger)
+    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm_eig', logger)
+    k_eigenvec = k_eigenvec[:, 1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
@@ -263,6 +279,8 @@ def norm_eig(G, k, clustering, PCA, logger):
     if (clustering == "Agglomerative"):
         # Cluster using agglomerative algorithm
         cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
+
+    cluster_labels = correct_cluster_labels(G, cluster_labels)
 
     return cluster_labels
 
@@ -273,7 +291,8 @@ def recursive(G, k, c, clustering, PCA, logger):
         L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
         logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
         # Cluster using k-means and the second smallest eigenvector
-        eigenvec_2 = k_eigenvec[:,1].reshape(-1,1)
+        eigenvec_2 = k_eigenvec[:, 1].reshape(-1, 1)
+        # eigenvec_2 = k_eigenvec
         if (clustering == 'Kmeans'):
             # Cluster using k-means
             cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
