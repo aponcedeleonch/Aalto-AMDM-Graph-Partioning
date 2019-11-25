@@ -240,7 +240,7 @@ def correct_cluster_labels(G, cluster_labels):
 def norm_lap(G, k, clustering, PCA, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm', logger)
-    k_eigenvec = k_eigenvec[:,1:]
+    k_eigenvec = k_eigenvec[:, 1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
