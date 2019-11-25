@@ -267,8 +267,8 @@ def recursive(G, k, c, clustering, PCA, logger):
         _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
         logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
         # Cluster using k-means and the second smallest eigenvector
-        #eigenvec_2 = k_eigenvec[:,1].reshape(-1,1)
-        eigenvec_2 = k_eigenvec
+        eigenvec_2 = k_eigenvec[:,1].reshape(-1,1)
+        #eigenvec_2 = k_eigenvec
         if (clustering == 'Kmeans'):
             # Cluster using k-means
             cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
