@@ -1,4 +1,4 @@
-from resources import graphs_files, algorithms
+from resources import graphs_files, algorithms, clustering
 import sys
 import argparse
 import networkx as nx
@@ -6,6 +6,7 @@ import numpy as np
 import logging
 import time
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import normalize
 from scipy import sparse
 import os
@@ -26,6 +27,10 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--algo", "-a",
                         type=str, help="Indicate normalization", default="Unorm",
                         choices=algorithms)
+    # Use different algorithms to run the script
+    parser.add_argument("--cluster", "-c",
+                        type=str, help="Indicate clustering", default="Kmeans",
+                        choices=clustering)
     # Argument to print to console
     parser.add_argument("--log", "-l",
                         type=str, help="Set logging level", default="INFO",
@@ -90,6 +95,13 @@ def cluster_k_means(k_eig, k, logger):
     kmeans = KMeans(n_clusters=k).fit(k_eig)
     logger.info('K-means finished. Returning the results')
     return kmeans.labels_
+
+def cluster_gmm(k_eig, k, logger):
+    logger.info('Using GMM to cluster the vertices')
+    gmm = GaussianMixture(n_components = k).fit(k_eig)
+    labels = gmm.predict(k_eig)
+    logger.info('GMM finished. Returning the results')
+    return labels
 
 
 def output_file(g_meta, clustered, logger):
@@ -181,7 +193,7 @@ def score_function(clustered, k, G, logger):
     return sum(k_score)
 
 
-def unorm(G, k, logger):
+def unorm(G, k,  clustering, PCA,logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
@@ -189,13 +201,17 @@ def unorm(G, k, logger):
     logger.debug(k_eigenvec)
     logger.debug('K-Eigenvalues')
     logger.debug(k_eigenval)
-    # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering == 'Kmeans'):
+        # Cluster using k-means
+        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering == "Gmm"):
+        #Cluster using gmm
+        cluster_labels = cluster_gmm(k_eigenvec, k, logger)
 
     return cluster_labels
 
 
-def norm_lap(G, k, logger):
+def norm_lap(G, k, clustering, PCA, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
@@ -203,12 +219,16 @@ def norm_lap(G, k, logger):
     logger.debug(k_eigenvec)
     logger.debug('K-Eigenvalues')
     logger.debug(k_eigenval)
-    # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering == 'Kmeans'):
+        # Cluster using k-means
+        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering == "Gmm"):
+        #Cluster using gmm
+        cluster_labels = cluster_gmm(k_eigenvec, k, logger)
     return cluster_labels
 
 
-def norm_eig(G, k, logger):
+def norm_eig(G, k, clustering, PCA, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'norm_eig', logger)
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
@@ -216,25 +236,35 @@ def norm_eig(G, k, logger):
     logger.debug(k_eigenvec)
     logger.debug('K-Eigenvalues')
     logger.debug(k_eigenval)
-    # Cluster using k-means
-    cluster_labels = cluster_k_means(k_eigenvec, G_meta['k'], logger)
+    if (clustering == 'Kmeans'):
+        # Cluster using k-means
+        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering == "Gmm"):
+        #Cluster using gmm
+        cluster_labels = cluster_gmm(k_eigenvec, k, logger)
 
     return cluster_labels
 
-def recursive(G, k, c, logger):
+def recursive(G, k, c, clustering, PCA, logger):
     if (k >= 2):
         # Get Laplacian, 2 eigenvalues and eigenvectors
         _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
         logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
         # Cluster using k-means and the second smallest eigenvector
         eigenvec_2 = k_eigenvec[:,1].reshape(-1,1)
-        cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+        if (clustering == 'Kmeans'):
+            # Cluster using k-means
+            cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+        if (clustering == "Gmm"):
+            #Cluster using gmm
+            cluster_labels = cluster_gmm(eigenvec_2, 2, logger)
+        #cluster_labels = cluster_gmm(eigenvec_2, 2, logger)
         # Nodes of the biggest cluster
         logger.debug("Graph partition")
         all_nodes = list(G)
         n = len(all_nodes)
         b_cluster = sum(cluster_labels)
-        logger.debug('Remaining iterations: %d.' % (k-1))
+        logger.info('Remaining iterations: %d.' % (k-1))
         if (b_cluster > n/2):
             indicator = 1
             indicator2 = 0
@@ -245,7 +275,7 @@ def recursive(G, k, c, logger):
         accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator2]
         subgraph = G.subgraph(nodes)
         c[k-1] = accepted_cluster
-        return recursive(subgraph, k-1, c, logger)
+        return recursive(subgraph, k-1, c, clustering, PCA, logger)
         #return c
     c[k-1] = list(G)
     return c
@@ -272,18 +302,18 @@ def hagen_kahng(G, k, logger):
     return cluster_labels
 
 
-def run_algorithm(G, k, algo, logger):
+def run_algorithm(G, k, algo, clustering, logger):
     logger.info('Going to execute algorithm: %s' % (algo))
     if (algo == 'Unorm'):
-        cluster_labels = unorm(G, k, logger)
+        cluster_labels = unorm(G, k, clustering, False, logger)
     elif (algo == 'NormLap'):
-        cluster_labels = norm_lap(G, k, logger)
+        cluster_labels = norm_lap(G, k, clustering, False, logger)
     elif(algo == 'NormEig'):
-        cluster_labels = norm_eig(G, k, logger)
+        cluster_labels = norm_eig(G, k, clustering, False, logger)
     elif(algo == 'Recursive'):
         #Empty dictionary to track  labels
         c={}
-        cluster_labels = recursive(G, k, c ,logger)
+        cluster_labels = recursive(G, k, c , clustering, False, logger)
         np_labels = np.zeros(len(list(G)))
         for i in range(k):
             for j in cluster_labels[i]:
@@ -323,7 +353,7 @@ if __name__ == '__main__':
     logger.info("Number of nodes: %d" % (G.number_of_nodes()))
     logger.info("Number of edges: %d" % (G.number_of_edges()))
 
-    cluster_labels = run_algorithm(G, G_meta['k'], args.algo, logger)
+    cluster_labels = run_algorithm(G, G_meta['k'], args.algo, args.cluster, logger)
 
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
