@@ -234,7 +234,7 @@ def recursive(G, k, c, logger):
         all_nodes = list(G)
         n = len(all_nodes)
         b_cluster = sum(cluster_labels)
-        logger.debug('Remaining iterations: %d.' % (k-1))
+        logger.info('Remaining iterations: %d.' % (k-1))
         if (b_cluster > n/2):
             indicator = 1
             indicator2 = 0

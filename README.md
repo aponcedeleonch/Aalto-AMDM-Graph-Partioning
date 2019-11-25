@@ -70,7 +70,7 @@ $ python main.py -h
 | Graph | NormLap | NormEig | Recursive |
 |---------------|---------|---------|-----------|
 | ca-GrQc | ? | ? | 0.2305 |
-| ca-HepTh | 100.04 | ? | 30.89 |
+| ca-HepTh | 100.04 | ? | 10.67 |
 | Oregon-1 | ? | ? | 5.74 |
 | ca-HepPh | ? | 494.67 | 51.484 |
 | ca-AstroPh | ? | ? | 208.42 |
