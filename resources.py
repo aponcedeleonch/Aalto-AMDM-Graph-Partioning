@@ -12,3 +12,5 @@ graphs_files = {
 }
 
 algorithms = ['Unorm', 'NormLap', 'NormEig', 'HagenKahng', 'Recursive']
+clustering = ['Kmeans', 'Gmm']
+
