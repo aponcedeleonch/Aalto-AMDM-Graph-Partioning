@@ -52,7 +52,7 @@ Available algorithms:
 - Unorm - Use un-normalized Laplacian and k clusters
 - NormLap - Use normalized Laplacian and k clusters
 - NormEig - Use normalized Laplacian, normalized rows of eigenvector matrix and k clusters
-- HagenKahng - Only useful for k=2. Use only second eigenvector to cluster. Based on [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf) - Lars Hagen and Andrew B. Kahng
+- HagenKahng - Only useful for k=2. Use only second eigenvector to cluster. Based on [New Spectral Methods for Ratio Cut Partitioning and Clustering](https://pdfs.semanticscholar.org/3627/8bf6919c6dced7d16dc0c02d725e1ed178f8.pdf) by Lars Hagen and Andrew B. Kahng
 - Recursive
 
 ```sh
@@ -99,7 +99,7 @@ Example:
 | ca-HepPh | 508.41 | ? | 494.67 | 51.484 | N/A |
 | ca-AstroPh | 1180.08 | ? | ? | 208.42 | N/A |
 | ca-CondMat | 880.23 | ? | ? | ? | N/A |
-| soc-Epinions1 | ? | ? | ? | 42.05 | N/A |
+| soc-Epinions1 | 11.83 | ? | ? | 42.05 | N/A |
 | web-NotreDame | ? | ? | ? | ? | N/A |
 | roadNet-CA | ? | ? | ? | ? | N/A |
 
@@ -115,7 +115,7 @@ Elapsed time for running each algorithm in each graph. In seconds
 | ca-HepPh | 7.76 | ? | ? | ? | N/A |
 | ca-AstroPh | 236.41 | ? | ? | ? | N/A |
 | ca-CondMat | 389.92 | ? | ? | ? | N/A |
-| soc-Epinions1 | ? | ? | ? | ? | N/A |
+| soc-Epinions1 | 6073.14 | ? | ? | ? | N/A |
 | web-NotreDame | ? | ? | ? | ? | N/A |
 | roadNet-CA | ? | ? | ? | ? | N/A |
 
