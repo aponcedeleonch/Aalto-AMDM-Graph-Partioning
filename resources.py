@@ -11,4 +11,6 @@ graphs_files = {
     'dummy': 'graphs_processed/dummy.txt'
 }
 
-algorithms = ["Unorm", 'NormLap', 'NormEig', 'HagenKahng','Recursive']
+algorithms = ['Unorm', 'NormLap', 'NormEig', 'HagenKahng', 'Recursive']
+clustering = ['Kmeans', 'Gmm']
+
