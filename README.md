@@ -93,14 +93,14 @@ Example:
 
 | Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
 |---------------|---------|---------|---------|-----------|-----------|
-| ca-GrQc | 8.85 | ? | ? | 0.2305 | 2.00 |
-| ca-HepTh | 90.45 | 100.04 | ? | 10.67 | N/A |
-| Oregon-1 | 9.02 | ? | ? | 5.74 | N/A |
-| ca-HepPh | 508.41 | ? | 494.67 | 51.484 | N/A |
-| ca-AstroPh | 1180.08 | ? | ? | 208.42 | N/A |
-| ca-CondMat | 880.23 | ? | ? | ? | N/A |
-| soc-Epinions1 | 11.83 | ? | ? | 42.05 | N/A |
-| web-NotreDame | ? | ? | ? | ? | N/A |
+| ca-GrQc | ? | 0.083 | ? | 0.2305 | 2.00 |
+| ca-HepTh | ? | 5.93 | ? | 10.67 | N/A |
+| Oregon-1 | ? | 0.48 | ? | 5.74 | N/A |
+| ca-HepPh | ? | 15.28 | 494.67 | 51.484 | N/A |
+| ca-AstroPh | ? | 40.99 | ? | 208.42 | N/A |
+| ca-CondMat | ? | 68.22 | ? | ? | N/A |
+| soc-Epinions1 | ? | 1.08 | ? | 42.05 | N/A |
+| web-NotreDame | ? | 2702.41 | ? | ? | N/A |
 | roadNet-CA | ? | ? | ? | ? | N/A |
 
 ### Elapsed times
@@ -109,14 +109,14 @@ Elapsed time for running each algorithm in each graph. In seconds
 
 | Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
 |---------------|---------|---------|---------|-----------|-----------|
-| ca-GrQc | 4.56 | ? | ? | ? | 87.10 |
-| ca-HepTh | 1.84 | ? | ? | ? | N/A |
-| Oregon-1 | 6.77 | ? | ? | ? | N/A |
-| ca-HepPh | 7.76 | ? | ? | ? | N/A |
-| ca-AstroPh | 236.41 | ? | ? | ? | N/A |
-| ca-CondMat | 389.92 | ? | ? | ? | N/A |
-| soc-Epinions1 | 6073.14 | ? | ? | ? | N/A |
-| web-NotreDame | ? | ? | ? | ? | N/A |
+| ca-GrQc | ? | 0.52 | ? | ? | 87.10 |
+| ca-HepTh | ? | 0.94 | ? | ? | N/A |
+| Oregon-1 | ? | 1.56 | ? | ? | N/A |
+| ca-HepPh | ? | 1.99 | ? | ? | N/A |
+| ca-AstroPh | ? | 6.57 | ? | ? | N/A |
+| ca-CondMat | ? | 27.25 | ? | ? | N/A |
+| soc-Epinions1 | ? | 8.89 | ? | ? | N/A |
+| web-NotreDame | ? | 285.24 | ? | ? | N/A |
 | roadNet-CA | ? | ? | ? | ? | N/A |
 
 
