@@ -93,15 +93,15 @@ Example:
 
 | Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
 |---------------|---------|---------|---------|-----------|-----------|
-| ca-GrQc | ? | 0.083 | ? | 0.2305 | 2.00 |
-| ca-HepTh | ? | 5.93 | ? | 10.67 | N/A |
-| Oregon-1 | ? | 0.48 | ? | 5.74 | N/A |
-| ca-HepPh | ? | 15.28 | 494.67 | 51.484 | N/A |
-| ca-AstroPh | ? | 40.99 | ? | 208.42 | N/A |
-| ca-CondMat | ? | 68.22 | ? | ? | N/A |
-| soc-Epinions1 | ? | 1.08 | ? | 42.05 | N/A |
-| web-NotreDame | ? | 2702.41 | ? | ? | N/A |
-| roadNet-CA | ? | ? | ? | ? | N/A |
+| ca-GrQc | 0.0835 | 0.083 | 0.362 | 0.2305 | 2.00 |
+| ca-HepTh | 2.442 | 5.93 | 17.933 | 10.67 | N/A |
+| Oregon-1 | 0.738 | 0.48 | 1.300 | 5.74 | N/A |
+| ca-HepPh | 5.578 | 15.28 | 59.487 | 51.484 | N/A |
+| ca-AstroPh | 15.563 | 40.99 | 221.916 | 73.273 | N/A |
+| ca-CondMat | 30.180 | 68.22 | 215.75 | ? | N/A |
+| soc-Epinions1 | 0.8143 | 1.08 | 10.292 | 42.05 | N/A |
+| web-NotreDame | ? | 2702.41 | 0.115 | ? | N/A |
+| roadNet-CA | ? | ? | 0.276 | ? | N/A |
 
 ### Elapsed times
 
@@ -109,15 +109,15 @@ Elapsed time for running each algorithm in each graph. In seconds
 
 | Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
 |---------------|---------|---------|---------|-----------|-----------|
-| ca-GrQc | ? | 0.52 | ? | ? | 87.10 |
-| ca-HepTh | ? | 0.94 | ? | ? | N/A |
-| Oregon-1 | ? | 1.56 | ? | ? | N/A |
-| ca-HepPh | ? | 1.99 | ? | ? | N/A |
-| ca-AstroPh | ? | 6.57 | ? | ? | N/A |
-| ca-CondMat | ? | 27.25 | ? | ? | N/A |
-| soc-Epinions1 | ? | 8.89 | ? | ? | N/A |
-| web-NotreDame | ? | 285.24 | ? | ? | N/A |
-| roadNet-CA | ? | ? | ? | ? | N/A |
+| ca-GrQc | 5.383 | 0.52 | 0.60 | 0.84 | 87.10 |
+| ca-HepTh | 1.98 | 0.94 | 1.30 | 23.49 | N/A |
+| Oregon-1 | 7.16 | 1.56 | 0.48 | 1.967 | N/A |
+| ca-HepPh | 8.174 | 1.99 | 2.99 | 122.00 | N/A |
+| ca-AstroPh | 259.43 | 6.57 | 8.80 | 167.93 | N/A |
+| ca-CondMat | 377.83 | 27.25 | 33.21 | ? | N/A |
+| soc-Epinions1 | 4505.20 | 8.89 | 8.83 | 59.40 | N/A |
+| web-NotreDame | ? | 285.24 | 285.80 | ? | N/A |
+| roadNet-CA | ? | ? | 12004.48 | ? | N/A |
 
 
 ### Resources
