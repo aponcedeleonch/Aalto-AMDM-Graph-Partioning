@@ -98,9 +98,9 @@ Example:
 | Oregon-1 | 0.738 | 1.560 | 1.300 | 5.74 | N/A |
 | ca-HepPh | 5.578 | 15.280 | 59.487 | 51.484 | N/A |
 | ca-AstroPh | 15.563 | 40.994 | 221.916 | 73.273 | N/A |
-| ca-CondMat | 30.180 | 68.223 | 215.75 | ? | N/A |
+| ca-CondMat | 30.180 | 68.223 | 215.75 | Error | N/A |
 | soc-Epinions1 | 0.8143 | 1.085 | 10.292 | 42.05 | N/A |
-| web-NotreDame | ? | 2702.41 | 0.115 | ? | N/A |
+| web-NotreDame | ? | 2702.41 | 0.115 | Error | N/A |
 | roadNet-CA | ? | 4.4936 | 0.276 | ? | N/A |
 
 ### Elapsed times
@@ -114,9 +114,9 @@ Elapsed time for running each algorithm in each graph. In seconds
 | Oregon-1 | 7.16 | 0.48 | 0.48 | 1.967 | N/A |
 | ca-HepPh | 8.174 | 1.99 | 2.99 | 122.00 | N/A |
 | ca-AstroPh | 259.43 | 6.57 | 8.80 | 167.93 | N/A |
-| ca-CondMat | 377.83 | 27.25 | 33.21 | ? | N/A |
+| ca-CondMat | 377.83 | 27.25 | 33.21 | Error | N/A |
 | soc-Epinions1 | 4505.20 | 8.89 | 8.83 | 59.40 | N/A |
-| web-NotreDame | ? | 285.24 | 285.80 | ? | N/A |
+| web-NotreDame | ? | 285.24 | 285.80 | Error | N/A |
 | roadNet-CA | ? | 11929.53 | 12004.48 | ? | N/A |
 
 
