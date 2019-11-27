@@ -10,9 +10,11 @@ from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import normalize
 from scipy import sparse
 import os
+import pickle
 
 
 OUT_FOLDER = './outputs'
+COMP_FOLDER = './computed'
 
 
 # Parse script arguments
@@ -205,30 +207,6 @@ def score_function(clustered, k, G, logger):
     return sum(k_score)
 
 
-def unorm(G, k, clustering, PCA, logger):
-    # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'u', logger)
-    k_eigenvec = k_eigenvec[:, 1:]
-    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
-    logger.debug('K-Eigenvectors')
-    logger.debug(k_eigenvec)
-    logger.debug('K-Eigenvalues')
-    logger.debug(k_eigenval)
-    if (clustering == 'Kmeans'):
-        # Cluster using k-means
-        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
-    if (clustering == "Gmm"):
-        # Cluster using gmm
-        cluster_labels = cluster_gmm(k_eigenvec, k, logger)
-    if (clustering == "Agglomerative"):
-        # Cluster using agglomerative algorithm
-        cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
-
-    cluster_labels = correct_cluster_labels(G, cluster_labels)
-
-    return cluster_labels
-
-
 def correct_cluster_labels(G, cluster_labels):
     all_nodes = list(G)
     np_labels = np.zeros(len(all_nodes))
@@ -237,15 +215,64 @@ def correct_cluster_labels(G, cluster_labels):
     return np_labels
 
 
-def norm_lap(G, k, clustering, PCA, logger):
+def get_stored_L_eigv(G_meta, norm, k, logger):
+    eigv_file = '%s_%s_%d_eigv.pkl' % (G_meta['name'], norm, k)
+    lap_file = '%s_%s_%d_lap.pkl' % (G_meta['name'], norm, k)
+
+    eigv_path = COMP_FOLDER + '/' + eigv_file
+    lap_path = COMP_FOLDER + '/' + lap_file
+
+    try:
+        logger.debug('Looking for eigenvector file: %s' % (eigv_path))
+        logger.debug('Looking for laplacian file: %s' % (lap_path))
+
+        with open(eigv_path, 'rb') as file:
+            eigenvec = pickle.load(file=file)
+            logger.info('Eigenvector file found')
+
+        with open(lap_path, 'rb') as file:
+            L = pickle.load(file=file)
+            logger.info('Laplacian file found')
+
+    except FileNotFoundError:
+        eigenvec = None
+        L = None
+        logger.info('Eigenvector or Laplacian file not found')
+
+    return L, eigenvec
+
+
+def store_L_eigv(G_meta, norm, k, eigv, L, logger):
+    eigv_file = '%s_%s_%d_eigv.pkl' % (G_meta['name'], norm, k)
+    lap_file = '%s_%s_%d_lap.pkl' % (G_meta['name'], norm, k)
+
+    eigv_path = COMP_FOLDER + '/' + eigv_file
+    lap_path = COMP_FOLDER + '/' + lap_file
+
+    with open(eigv_path, 'wb') as file:
+        pickle.dump(eigv, file=file, protocol=4)
+        logger.info('Eigenvector information dumped to file')
+        logger.debug('Writren eigevector file: %s' % (eigv_path))
+
+    with open(lap_path, 'wb') as file:
+        pickle.dump(L, file=file, protocol=4)
+        logger.info('Laplacian information dumped to file')
+        logger.debug('Writren Laplacian file: %s' % (lap_path))
+
+
+def unorm(G, G_meta, clustering, PCA, logger):
+    k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm', logger)
+    L, k_eigenvec = get_stored_L_eigv(G_meta, 'unorm', k, logger)
+    if k_eigenvec is None:
+        logger.info('Going to compute Laplacian and eigenvectors')
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'u', logger)
+        store_L_eigv(G_meta, 'unorm', k, k_eigenvec, L, logger)
+
     k_eigenvec = k_eigenvec[:, 1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
-    logger.debug('K-Eigenvalues')
-    logger.debug(k_eigenval)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
         cluster_labels = cluster_k_means(k_eigenvec, k, logger)
@@ -261,15 +288,45 @@ def norm_lap(G, k, clustering, PCA, logger):
     return cluster_labels
 
 
-def norm_eig(G, k, clustering, PCA, logger):
+def norm_lap(G, G_meta, clustering, PCA, logger):
+    k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm_eig', logger)
+    L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
+    if k_eigenvec is None:
+        logger.info('Going to compute Laplacian and eigenvectors')
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm', logger)
+        store_L_eigv(G, 'norm', k, k_eigenvec, L, logger)
     k_eigenvec = k_eigenvec[:, 1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
-    logger.debug('K-Eigenvalues')
-    logger.debug(k_eigenval)
+    if (clustering == 'Kmeans'):
+        # Cluster using k-means
+        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering == "Gmm"):
+        # Cluster using gmm
+        cluster_labels = cluster_gmm(k_eigenvec, k, logger)
+    if (clustering == "Agglomerative"):
+        # Cluster using agglomerative algorithm
+        cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
+
+    cluster_labels = correct_cluster_labels(G, cluster_labels)
+
+    return cluster_labels
+
+
+def norm_eig(G, G_meta, clustering, PCA, logger):
+    k = G_meta['k']
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
+    if k_eigenvec is None:
+        logger.info('Going to compute Laplacian and eigenvectors')
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G_meta, k+1, 'norm_eig', logger)
+        store_L_eigv(G_meta, 'norm', k, k_eigenvec, L, logger)
+    k_eigenvec = k_eigenvec[:, 1:]
+    logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
+    logger.debug('K-Eigenvectors')
+    logger.debug(k_eigenvec)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
         cluster_labels = cluster_k_means(k_eigenvec, k, logger)
@@ -324,18 +381,22 @@ def recursive(G, k, c, clustering, PCA, logger):
     return c
 
 
-def hagen_kahng(G, k, logger):
+def hagen_kahng(G, G_meta, logger):
+    k = G_meta['k']
     # Throws an execption if k!=2
     if k != 2:
         raise ValueError(('Hagen Kahng algorithm only works with k=2.'
                           'Trying to execute k=%d') % (k))
     # Get the Unormalized Laplacian matrix
-    _, k_eigenval, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k, 'u', logger)
+    _, k_eigenvec = get_stored_L_eigv(G_meta, 'unorm', k, logger)
+    if k_eigenvec is None:
+        logger.info('Going to compute Laplacian and eigenvectors')
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'u', logger)
+        store_L_eigv(G_meta, 'unorm', k, k_eigenvec, L, logger)
+
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
-    logger.debug('K-Eigenvalues')
-    logger.debug(k_eigenval)
     # Getting only the second eigenvector
     logger.info("Getting only second eigenvector")
     eigv_2 = k_eigenvec[:, 1]
@@ -347,16 +408,17 @@ def hagen_kahng(G, k, logger):
     return cluster_labels
 
 
-def run_algorithm(G, k, algo, clustering, logger):
+def run_algorithm(G, G_meta, algo, clustering, logger):
     logger.info('Going to execute algorithm: %s' % (algo))
     if (algo == 'Unorm'):
-        cluster_labels = unorm(G, k, clustering, False, logger)
+        cluster_labels = unorm(G, G_meta, clustering, False, logger)
     elif (algo == 'NormLap'):
-        cluster_labels = norm_lap(G, k, clustering, False, logger)
+        cluster_labels = norm_lap(G, G_meta, clustering, False, logger)
     elif(algo == 'NormEig'):
-        cluster_labels = norm_eig(G, k, clustering, False, logger)
+        cluster_labels = norm_eig(G, G_meta, clustering, False, logger)
     elif(algo == 'Recursive'):
         # Empty dictionary to track  labels
+        k = G_meta['k']
         c = {}
         cluster_labels = recursive(G, k, c, clustering, False, logger)
         np_labels = np.zeros(len(list(G)))
@@ -365,7 +427,7 @@ def run_algorithm(G, k, algo, clustering, logger):
                 np_labels[int(j)] = i
         cluster_labels = np_labels
     elif(algo == 'HagenKahng'):
-        cluster_labels = hagen_kahng(G, k, logger)
+        cluster_labels = hagen_kahng(G, G_meta, logger)
     logger.info('Algorithm execution finished: %s' % (algo))
 
     return cluster_labels
@@ -398,7 +460,10 @@ if __name__ == '__main__':
     logger.info("Number of nodes: %d" % (G.number_of_nodes()))
     logger.info("Number of edges: %d" % (G.number_of_edges()))
 
-    cluster_labels = run_algorithm(G, G_meta['k'], args.algo, args.cluster, logger)
+    # Make a folder to store the eigenvectors
+    os.makedirs(COMP_FOLDER, exist_ok=True)
+
+    cluster_labels = run_algorithm(G, G_meta, args.algo, args.cluster, logger)
 
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
