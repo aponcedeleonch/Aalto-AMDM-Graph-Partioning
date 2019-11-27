@@ -4,6 +4,10 @@
 # Results from script
 *output*
 
+# Results from eigenvectos and Laplacian
+*computed*
+*.pkl
+
 # Virtual env
 *env*
 
