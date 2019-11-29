@@ -13,3 +13,6 @@ graphs_files = {
 
 algorithms = ['Unorm', 'NormLap', 'NormEig', 'HagenKahng', 'Recursive']
 clustering = ['Kmeans', 'Gmm', 'Agglomerative']
+
+OUT_FOLDER = './outputs'
+COMP_FOLDER = './computed'
