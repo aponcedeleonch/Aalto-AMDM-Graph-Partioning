@@ -9,6 +9,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import normalize
 from scipy import sparse
+from scipy.spatial.distance import pdist, squareform
 import os
 import pickle
 
@@ -96,7 +97,14 @@ def cluster_k_means(k_eig, k, logger):
     logger.info('Using k-means to cluster the vertices')
     kmeans = KMeans(n_clusters=k).fit(k_eig)
     logger.info('K-means finished. Returning the results')
-    return kmeans.labels_
+    return kmeans.cluster_centers_, kmeans.labels_
+
+def get_closest_clusters(cluster_centers):
+    cluster_distances = pdist(cluster_centers, metric='euclidean')
+    cluster_distances = np.triu(squareform(cluster_distances))
+    cluster_distances[cluster_distances == 0] = np.Inf
+    closest_clusters = np.argwhere(cluster_distances == np.min(cluster_distances))
+    return closest_clusters
 
 
 def cluster_agglomerative(k_eig, k, logger, L=None):
@@ -275,7 +283,8 @@ def unorm(G, G_meta, clustering, PCA, logger):
     logger.debug(k_eigenvec)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
-        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+        cluster_centers, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+        print(get_closest_clusters(cluster_centers))
     if (clustering == "Gmm"):
         # Cluster using gmm
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
@@ -302,7 +311,7 @@ def norm_lap(G, G_meta, clustering, PCA, logger):
     logger.debug(k_eigenvec)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
-        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+        _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
     if (clustering == "Gmm"):
         # Cluster using gmm
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
@@ -329,7 +338,7 @@ def norm_eig(G, G_meta, clustering, PCA, logger):
     logger.debug(k_eigenvec)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
-        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+        _,cluster_labels = cluster_k_means(k_eigenvec, k, logger)
     if (clustering == "Gmm"):
         # Cluster using gmm
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
@@ -352,7 +361,7 @@ def recursive(G, k, c, clustering, PCA, logger):
         # eigenvec_2 = k_eigenvec
         if (clustering == 'Kmeans'):
             # Cluster using k-means
-            cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+            _, cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
         if (clustering == "Gmm"):
             # Cluster using gmm
             cluster_labels = cluster_gmm(eigenvec_2, 2, logger)
