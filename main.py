@@ -304,7 +304,7 @@ def norm_lap(G, G_meta, clustering, PCA, logger):
     if k_eigenvec is None:
         logger.info('Going to compute Laplacian and eigenvectors')
         L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k+1, 'norm', logger)
-        store_L_eigv(G, 'norm', k, k_eigenvec, L, logger)
+        store_L_eigv(G_meta, 'norm', k, k_eigenvec, L, logger)
     k_eigenvec = k_eigenvec[:, 1:]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
