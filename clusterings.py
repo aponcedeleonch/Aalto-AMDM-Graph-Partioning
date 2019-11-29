@@ -11,11 +11,7 @@ def cluster_k_means(k_eig, k, logger):
 
 def cluster_agglomerative(k_eig, k, logger, L=None):
     logger.info('Using Agglomerative clustering to cluster the vertices')
-    if L is None:
-        agglomerative = AgglomerativeClustering(n_clusters=k).fit(k_eig)
-    else:
-        agglomerative = AgglomerativeClustering(n_clusters=k,
-                                                connectivity=L).fit(k_eig)
+    agglomerative = AgglomerativeClustering(n_clusters=k).fit(k_eig)
     logger.info('Agglomerative clustering finished. Returning the results')
     return agglomerative.labels_
 

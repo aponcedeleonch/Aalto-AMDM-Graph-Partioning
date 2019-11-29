@@ -35,6 +35,9 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--file", "-f",
                         type=str, help="Name of the log file",
                         default="graph.log")
+    # Flag to dump the first eigenvector
+    parser.add_argument("--dump",
+                        action="store_true", help="Discard the first eigenvector")
     return parser.parse_args(args)
 
 
@@ -89,14 +92,14 @@ def output_file(g_meta, clustered, logger):
     return out_name, header + cluster_str
 
 
-def run_algorithm(G, G_meta, algo, clustering, logger):
+def run_algorithm(G, G_meta, algo, clustering, dump, logger):
     logger.info('Going to execute algorithm: %s' % (algo))
     if (algo == 'Unorm'):
-        cluster_labels = unorm(G, G_meta, clustering, False, logger)
+        cluster_labels = unorm(G, G_meta, clustering, dump, False, logger)
     elif (algo == 'NormLap'):
-        cluster_labels = norm_lap(G, G_meta, clustering, False, logger)
+        cluster_labels = norm_lap(G, G_meta, clustering, dump, False, logger)
     elif(algo == 'NormEig'):
-        cluster_labels = norm_eig(G, G_meta, clustering, False, logger)
+        cluster_labels = norm_eig(G, G_meta, clustering, dump, False, logger)
     elif(algo == 'Recursive'):
         # Empty dictionary to track  labels
         k = G_meta['k']
@@ -144,7 +147,7 @@ if __name__ == '__main__':
     # Make a folder to store the eigenvectors
     os.makedirs(COMP_FOLDER, exist_ok=True)
 
-    cluster_labels = run_algorithm(G, G_meta, args.algo, args.cluster, logger)
+    cluster_labels = run_algorithm(G, G_meta, args.algo, args.cluster, args.dump, logger)
 
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)
