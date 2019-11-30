@@ -118,12 +118,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k, ncv=5*k)
-    if (norm_decide == 'norm_eig'):
-        logger.info('Normalizing eigenvec matrix')
-        # Normaliz by the samples (rows)
-        eigenvec = normalize(eigenvec, axis=1, norm='l2')
-        # Normaliz by the features (cols)
-        eigenvec = normalize(eigenvec, axis=0, norm='l2')
+
     logger.info('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
 
@@ -156,11 +151,11 @@ def get_clustering(G, k_eigenvec, k, clustering, dump, logger):
     return cluster_labels
 
 
-def unorm(G, G_meta, clustering, dump, PCA, logger):
+def unorm(G, G_meta, clustering, dump, cache, PCA, logger):
     k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, 'unorm', k, logger)
-    if k_eigenvec is None:
+    if k_eigenvec is None or cache:
         logger.info('Going to compute Laplacian and eigenvectors')
         # Going to get 1.5 more k eigenvectors than needed for fast computing
         k_comp = int(np.ceil(k*1.5))
@@ -172,38 +167,38 @@ def unorm(G, G_meta, clustering, dump, PCA, logger):
     return cluster_labels
 
 
-def norm_lap(G, G_meta, clustering, dump, PCA, logger):
+def norm_lap(G, G_meta, clustering, dump, cache, PCA, logger):
     k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
-    if k_eigenvec is None:
+    if k_eigenvec is None or cache:
         logger.info('Going to compute Laplacian and eigenvectors')
         # Going to get 1.5 more k eigenvectors than needed for fast computing
         k_comp = int(np.ceil(k*1.5))
         L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, 'norm', logger)
         store_L_eigv(G_meta, 'norm', k_comp, k_eigenvec, L, logger)
 
-    if k_eigenvec.shape[-1] < k+1:
-        raise ValueError('Not enough eigenvectors for keeping algorithm')
-
     cluster_labels = get_clustering(G, k_eigenvec, k, clustering, dump, logger)
 
     return cluster_labels
 
 
-def norm_eig(G, G_meta, clustering, dump, PCA, logger):
+def norm_eig(G, G_meta, clustering, dump, cache, PCA, logger):
     k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
-    if k_eigenvec is None:
+    if k_eigenvec is None or cache:
         logger.info('Going to compute Laplacian and eigenvectors')
         # Going to get 1.5 more k eigenvectors than needed for fast computing
         k_comp = int(np.ceil(k*1.5))
-        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, 'norm_eig', logger)
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, 'norm', logger)
         store_L_eigv(G_meta, 'norm', k_comp, k_eigenvec, L, logger)
 
-    if k_eigenvec.shape[-1] < k+1:
-        raise ValueError('Not enough eigenvectors for keeping algorithm')
+    logger.info('Normalizing eigenvector matrix')
+    # Normalize by samples (rows)
+    k_eigenvec = normalize(k_eigenvec, axis=1, norm='l2')
+    # Normalize by features (cols)
+    k_eigenvec = normalize(k_eigenvec, axis=0, norm='l2')
 
     cluster_labels = get_clustering(G, k_eigenvec, k, clustering, dump, logger)
 
@@ -249,7 +244,7 @@ def recursive(G, k, c, clustering, PCA, logger):
     return c
 
 
-def hagen_kahng(G, G_meta, logger):
+def hagen_kahng(G, G_meta, cache, logger):
     k = G_meta['k']
     # Throws an execption if k!=2
     if k != 2:
@@ -257,7 +252,7 @@ def hagen_kahng(G, G_meta, logger):
                           'Trying to execute k=%d') % (k))
     # Get the Unormalized Laplacian matrix
     _, k_eigenvec = get_stored_L_eigv(G_meta, 'unorm', k, logger)
-    if k_eigenvec is None:
+    if k_eigenvec is None or cache:
         logger.info('Going to compute Laplacian and eigenvectors')
         # Going to get 1.5 more k eigenvectors than needed for fast computing
         k_comp = int(np.ceil(k*1.5))
@@ -267,7 +262,6 @@ def hagen_kahng(G, G_meta, logger):
     if k_eigenvec.shape[-1] < k+1:
         raise ValueError('Not enough eigenvectors for keeping algorithm')
 
-    k_eigenvec = k_eigenvec[:, 1:k+1]
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
