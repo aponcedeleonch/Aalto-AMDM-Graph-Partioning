@@ -129,6 +129,7 @@ def get_clustering(G, k_eigenvec, k, clustering, dump, logger):
 
     # Dump the first eigenvector if specified
     if dump:
+        logger.info('Dumping the first eigenvector before clustering')
         k_eigenvec = k_eigenvec[:, 1:k+1]
     else:
         k_eigenvec = k_eigenvec[:, :k]
@@ -208,7 +209,7 @@ def norm_eig(G, G_meta, clustering, dump, cache, PCA, logger):
 def recursive(G, k, c, clustering, PCA, logger):
     if (k >= 2):
         # Get Laplacian, 2 eigenvalues and eigenvectors
-        L, _, k_eigenvec, _ = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
         logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
         # Cluster using k-means and the second smallest eigenvector
         eigenvec_2 = k_eigenvec[:, 1].reshape(-1, 1)
