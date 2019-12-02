@@ -119,6 +119,16 @@ Using Agglomerative for clustering and K-eigenvectors
 | web-NotreDame | ? | Error | Error | ? | N/A |
 | roadNet-CA | ? | Error | Error | ? | N/A |
 
+Graph competition
+
+| Graph | Personal Best | Min Top 10
+|---------------|---------------|---------------|
+| ca-GrQc | 0.6003 | 0.0838 |
+| Oregon-1 | 0.693 | 1.031 |
+| soc-Epinions1 | Error | Error |
+| web-NotreDame | ? | Error | Error |
+| roadNet-CA | ? | Error | Error | ? |
+
 ### Elapsed times
 
 Elapsed time for running each algorithm in each graph. In seconds

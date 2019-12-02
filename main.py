@@ -27,6 +27,10 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--cluster", "-c",
                         type=str, help="Indicate clustering", default="Kmeans",
                         choices=clustering)
+    # Use more than k eigenvectors to run the clustering
+    parser.add_argument("--k_custom", "-k",
+                        type=int, default=None,
+                        help="Indicate a custom number of k to get eigenvectors")
     # Argument to print to console
     parser.add_argument("--log", "-l",
                         type=str, help="Set logging level", default="INFO",
@@ -96,14 +100,17 @@ def output_file(g_meta, clustered, logger):
     return out_name, header + cluster_str
 
 
-def run_algorithm(G, G_meta, algo, clustering, dump, cache, logger):
+def run_algorithm(G, G_meta, algo, clustering, dump, cache, k, logger):
     logger.info('Going to execute algorithm: %s' % (algo))
     if (algo == 'Unorm'):
-        cluster_labels = unorm(G, G_meta, clustering, dump, cache, False, logger)
+        cluster_labels = unorm(G=G, G_meta=G_meta, clustering=clustering,
+                               dump=dump, cache=cache, k=k, logger=logger)
     elif (algo == 'NormLap'):
-        cluster_labels = norm_lap(G, G_meta, clustering, dump, cache, False, logger)
+        cluster_labels = norm_lap(G=G, G_meta=G_meta, clustering=clustering,
+                                  dump=dump, cache=cache, k=k, logger=logger)
     elif(algo == 'NormEig'):
-        cluster_labels = norm_eig(G, G_meta, clustering, dump, cache, False, logger)
+        cluster_labels = norm_eig(G=G, G_meta=G_meta, clustering=clustering,
+                                  dump=dump, cache=cache, k=k, logger=logger)
     elif(algo == 'Recursive'):
         # Empty dictionary to track  labels
         k = G_meta['k']
@@ -151,9 +158,14 @@ if __name__ == '__main__':
     # Make a folder to store the eigenvectors
     os.makedirs(COMP_FOLDER, exist_ok=True)
 
+    # In case there was a different number of k values specified
+    k = G_meta['k']
+    if args.k_custom is not None:
+        k = args.k_custom
+
     cluster_labels = run_algorithm(G=G, G_meta=G_meta, algo=args.algo,
                                    clustering=args.cluster, dump=args.dump,
-                                   cache=args.no_cache, logger=logger)
+                                   cache=args.no_cache, k=k, logger=logger)
 
     # Getting the data to writhe to file
     out_name, out_str = output_file(G_meta, cluster_labels, logger)

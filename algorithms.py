@@ -6,6 +6,7 @@ import pickle
 from resources import COMP_FOLDER
 from clusterings import cluster_k_means, cluster_agglomerative, cluster_gmm
 import glob
+import os
 
 
 def correct_cluster_labels(G, cluster_labels):
@@ -86,6 +87,27 @@ def get_stored_L_eigv(G_meta, norm, k, logger):
 
 
 def store_L_eigv(G_meta, norm, k, eigv, L, logger):
+    eigv_find_file = '%s_%s_*_eigv.pkl' % (G_meta['name'], norm)
+    lap_find_file = '%s_%s_*_lap.pkl' % (G_meta['name'], norm)
+
+    eigv_find_path = COMP_FOLDER + '/' + eigv_find_file
+    lap_find_path = COMP_FOLDER + '/' + lap_find_file
+
+    logger.debug('Looking for existent eigenvector file: %s' % (eigv_find_path))
+    logger.debug('Looking for existent laplacian file: %s' % (lap_find_path))
+
+    list_eigv = glob.glob(eigv_find_path)
+    list_lap = glob.glob(lap_find_path)
+
+    logger.debug('Found eigenvector files: %s' % (list_eigv, ))
+    logger.debug('Found Laplacian files: %s' % (list_lap, ))
+
+    for file_eigv in list_eigv:
+        os.remove(file_eigv)
+
+    for file_lap in list_lap:
+        os.remove(file_lap)
+
     eigv_file = '%s_%s_%d_eigv.pkl' % (G_meta['name'], norm, k)
     lap_file = '%s_%s_%d_lap.pkl' % (G_meta['name'], norm, k)
 
@@ -123,17 +145,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     return L, eigenval, eigenvec
 
 
-def get_clustering(G, k_eigenvec, k, clustering, dump, logger):
-    if k_eigenvec.shape[-1] < k+1:
-        raise ValueError('Not enough eigenvectors for keeping algorithm')
-
-    # Dump the first eigenvector if specified
-    if dump:
-        logger.info('Dumping the first eigenvector before clustering')
-        k_eigenvec = k_eigenvec[:, 1:k+1]
-    else:
-        k_eigenvec = k_eigenvec[:, :k]
-
+def get_clustering(G, k_eigenvec, k, clustering, L, logger):
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
@@ -145,55 +157,86 @@ def get_clustering(G, k_eigenvec, k, clustering, dump, logger):
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
     if (clustering == "Agglomerative"):
         # Cluster using agglomerative algorithm
-        cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
+        # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
+        cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
 
     cluster_labels = correct_cluster_labels(G, cluster_labels)
 
     return cluster_labels
 
 
-def unorm(G, G_meta, clustering, dump, cache, PCA, logger):
-    k = G_meta['k']
+def compute_eigenvectors_laplacian(G, G_meta, dump, cache, k, norm_flag, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenvec = get_stored_L_eigv(G_meta, 'unorm', k, logger)
-    if k_eigenvec is None or cache:
+    L, k_eigenvec = get_stored_L_eigv(G_meta, norm_flag, k, logger)
+    compute = False
+
+    if cache:
+        compute = True
+    else:
+        if k_eigenvec is None:
+            compute = True
+        else:
+            if k_eigenvec.shape[-1] < k+1:
+                compute = True
+                logger.info('Not enough stored eigenvectors')
+
+    if compute:
         logger.info('Going to compute Laplacian and eigenvectors')
         # Going to get 1.5 more k eigenvectors than needed for fast computing
         k_comp = int(np.ceil(k*1.5))
-        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, 'u', logger)
-        store_L_eigv(G_meta, 'unorm', k_comp, k_eigenvec, L, logger)
+        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, norm_flag, logger)
+        logger.info('Storing the new eigenvectors and laplacian')
+        store_L_eigv(G_meta, norm_flag, k_comp, k_eigenvec, L, logger)
 
-    cluster_labels = get_clustering(G, k_eigenvec, k, clustering, dump, logger)
+    # Dump the first eigenvector if specified
+    if dump:
+        logger.info('Dumping the first eigenvector before clustering')
+        k_eigenvec = k_eigenvec[:, 1:k+1]
+    else:
+        k_eigenvec = k_eigenvec[:, :k]
+
+    return L, k_eigenvec
+
+
+def unorm(G, G_meta, clustering, dump, cache, k, logger):
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
+                                                   G_meta=G_meta,
+                                                   dump=dump,
+                                                   cache=cache,
+                                                   k=k,
+                                                   norm_flag='unorm',
+                                                   logger=logger)
+
+    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, logger)
 
     return cluster_labels
 
 
-def norm_lap(G, G_meta, clustering, dump, cache, PCA, logger):
-    k = G_meta['k']
+def norm_lap(G, G_meta, clustering, dump, cache, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
-    if k_eigenvec is None or cache:
-        logger.info('Going to compute Laplacian and eigenvectors')
-        # Going to get 1.5 more k eigenvectors than needed for fast computing
-        k_comp = int(np.ceil(k*1.5))
-        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, 'norm', logger)
-        store_L_eigv(G_meta, 'norm', k_comp, k_eigenvec, L, logger)
+    L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
+                                                   G_meta=G_meta,
+                                                   dump=dump,
+                                                   cache=cache,
+                                                   k=k,
+                                                   norm_flag='norm',
+                                                   logger=logger)
 
-    cluster_labels = get_clustering(G, k_eigenvec, k, clustering, dump, logger)
+    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, logger)
 
     return cluster_labels
 
 
-def norm_eig(G, G_meta, clustering, dump, cache, PCA, logger):
-    k = G_meta['k']
+def norm_eig(G, G_meta, clustering, dump, cache, k, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
-    L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
-    if k_eigenvec is None or cache:
-        logger.info('Going to compute Laplacian and eigenvectors')
-        # Going to get 1.5 more k eigenvectors than needed for fast computing
-        k_comp = int(np.ceil(k*1.5))
-        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, k_comp, 'norm', logger)
-        store_L_eigv(G_meta, 'norm', k_comp, k_eigenvec, L, logger)
+    L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
+                                                   G_meta=G_meta,
+                                                   dump=dump,
+                                                   cache=cache,
+                                                   k=k,
+                                                   norm_flag='norm',
+                                                   logger=logger)
 
     logger.info('Normalizing eigenvector matrix')
     # Normalize by samples (rows)
@@ -201,7 +244,7 @@ def norm_eig(G, G_meta, clustering, dump, cache, PCA, logger):
     # Normalize by features (cols)
     k_eigenvec = normalize(k_eigenvec, axis=0, norm='l2')
 
-    cluster_labels = get_clustering(G, k_eigenvec, k, clustering, dump, logger)
+    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, logger)
 
     return cluster_labels
 
