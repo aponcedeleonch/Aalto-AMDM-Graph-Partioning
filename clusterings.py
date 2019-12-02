@@ -45,7 +45,7 @@ def merge_nodes(G, n, k_eig, k, cluster_labels, cluster_centers, closest_cluster
             node = int(nodes_to_merge[j])
             labels[i][node] = combinations[i][j]
         labels[i] = correct_cluster_labels(G, labels[i])
-        if (i % int(n_labels/4) == 0):
+        if (i % int(n_labels/10) == 0):
                 logger.info('Grading combination %d.' % (i))
         prov_score = score_function(labels[i], k, G, logger)
         scores.append(prov_score)
@@ -85,7 +85,8 @@ def cluster_agglomerative(k_eig, k, logger, L=None):
     else:
         logger.info('Using L as connectivity matrix')
         agglomerative = AgglomerativeClustering(n_clusters=k,
-                                                connectivity=L).fit(k_eig)
+                                                connectivity=L,
+                                                linkage='average').fit(k_eig)
     logger.info('Agglomerative clustering finished. Returning the results')
     return agglomerative.labels_
 
