@@ -27,6 +27,8 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--cluster", "-c",
                         type=str, help="Indicate clustering", default="Kmeans",
                         choices=clustering)
+    parser.add_argument("--nodes", "-n",
+                        type=int, help="Nodes to mergge in modified Kmans", default=3)                
     # Argument to print to console
     parser.add_argument("--log", "-l",
                         type=str, help="Set logging level", default="INFO",
@@ -91,17 +93,18 @@ def output_file(g_meta, clustered, logger):
 
 def run_algorithm(G, G_meta, algo, clustering, logger):
     logger.info('Going to execute algorithm: %s' % (algo))
+    n = args.nodes
     if (algo == 'Unorm'):
-        cluster_labels = unorm(G, G_meta, clustering, False, logger)
+        cluster_labels = unorm(G, G_meta, clustering, n, logger)
     elif (algo == 'NormLap'):
-        cluster_labels = norm_lap(G, G_meta, clustering, False, logger)
+        cluster_labels = norm_lap(G, G_meta, clustering, n, logger)
     elif(algo == 'NormEig'):
-        cluster_labels = norm_eig(G, G_meta, clustering, False, logger)
+        cluster_labels = norm_eig(G, G_meta, clustering, n, logger)
     elif(algo == 'Recursive'):
         # Empty dictionary to track  labels
         k = G_meta['k']
         c = {}
-        cluster_labels = recursive(G, k, c, clustering, False, logger)
+        cluster_labels = recursive(G, k, c, clustering, n, logger)
         np_labels = np.zeros(len(list(G)))
         for i in range(k):
             for j in cluster_labels[i]:

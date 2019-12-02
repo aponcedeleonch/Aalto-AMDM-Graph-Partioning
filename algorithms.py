@@ -73,7 +73,7 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     return L, eigenval, eigenvec
 
 
-def unorm(G, G_meta, clustering, PCA, logger):
+def unorm(G, G_meta, clustering, n, logger):
     k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, 'unorm', k, logger)
@@ -91,7 +91,7 @@ def unorm(G, G_meta, clustering, PCA, logger):
         _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
     if (clustering =='Kmeans_modified'):
         #Cluster usign modified Kmeans
-        n = 2
+        logger.info('To merge %d nodes per cluster' % (n))
         cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
         return cluster_labels
     if (clustering == "Gmm"):
@@ -105,7 +105,7 @@ def unorm(G, G_meta, clustering, PCA, logger):
     return cluster_labels
 
 
-def norm_lap(G, G_meta, clustering, PCA, logger):
+def norm_lap(G, G_meta, clustering, n, logger):
     k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
@@ -120,6 +120,11 @@ def norm_lap(G, G_meta, clustering, PCA, logger):
     if (clustering == 'Kmeans'):
         # Cluster using k-means
         _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering =='Kmeans_modified'):
+        #Cluster usign modified Kmeans
+        logger.info('To merge %d nodes per cluster' % (n))
+        cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
+        return cluster_labels
     if (clustering == "Gmm"):
         # Cluster using gmm
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
@@ -132,7 +137,7 @@ def norm_lap(G, G_meta, clustering, PCA, logger):
     return cluster_labels
 
 
-def norm_eig(G, G_meta, clustering, PCA, logger):
+def norm_eig(G, G_meta, clustering, n, logger):
     k = G_meta['k']
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, 'norm', k, logger)
@@ -147,6 +152,11 @@ def norm_eig(G, G_meta, clustering, PCA, logger):
     if (clustering == 'Kmeans'):
         # Cluster using k-means
         _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering =='Kmeans_modified'):
+        #Cluster usign modified Kmeans
+        logger.info('To merge %d nodes per cluster' % (n))
+        cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
+        return cluster_labels
     if (clustering == "Gmm"):
         # Cluster using gmm
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
@@ -159,7 +169,7 @@ def norm_eig(G, G_meta, clustering, PCA, logger):
     return cluster_labels
 
 
-def recursive(G, k, c, clustering, PCA, logger):
+def recursive(G, k, c, clustering, n, logger):
     if (k >= 2):
         # Get Laplacian, 2 eigenvalues and eigenvectors
         L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
@@ -170,6 +180,11 @@ def recursive(G, k, c, clustering, PCA, logger):
         if (clustering == 'Kmeans'):
             # Cluster using k-means
             _, cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+        if (clustering =='Kmeans_modified'):
+            #Cluster usign modified Kmeans
+            logger.info('To merge %d nodes per cluster' % (n))
+            cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
+            return cluster_labels
         if (clustering == "Gmm"):
             # Cluster using gmm
             cluster_labels = cluster_gmm(eigenvec_2, 2, logger)
@@ -179,10 +194,10 @@ def recursive(G, k, c, clustering, PCA, logger):
         # Nodes of the biggest cluster
         logger.debug("Graph partition")
         all_nodes = list(G)
-        n = len(all_nodes)
+        n_all = len(all_nodes)
         b_cluster = sum(cluster_labels)
         logger.info('Remaining iterations: %d.' % (k-1))
-        if (b_cluster > n/2):
+        if (b_cluster > n_all/2):
             indicator = 1
             indicator2 = 0
         else:
@@ -192,7 +207,7 @@ def recursive(G, k, c, clustering, PCA, logger):
         accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator2]
         subgraph = G.subgraph(nodes)
         c[k-1] = accepted_cluster
-        return recursive(subgraph, k-1, c, clustering, PCA, logger)
+        return recursive(subgraph, k-1, c, clustering, n, logger)
         # return c
     c[k-1] = list(G)
     return c
