@@ -123,11 +123,11 @@ Graph competition
 
 | Graph | Personal Best | Min Top 10
 |---------------|---------------|---------------|
-| ca-GrQc | 0.6003 | 0.0838 |
-| Oregon-1 | 0.693 | 1.031 |
-| soc-Epinions1 | Error | Error |
-| web-NotreDame | ? | Error | Error |
-| roadNet-CA | ? | Error | Error | ? |
+| ca-GrQc | 0.0757 | 0.0627 |
+| Oregon-1 | 0.6003 | 0.6392 |
+| soc-Epinions1 | 0.8143 | 0.7548 |
+| web-NotreDame | 0.1151 | 0.0778 |
+| roadNet-CA | 0.2762 | 0.2663 |
 
 ### Elapsed times
 
