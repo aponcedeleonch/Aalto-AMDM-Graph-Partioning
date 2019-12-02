@@ -3,47 +3,11 @@ from sklearn.preprocessing import normalize
 import numpy as np
 import networkx as nx
 import pickle
-from resources import COMP_FOLDER
-from clusterings import cluster_k_means, cluster_agglomerative, cluster_gmm
+from resources import COMP_FOLDER, score_function, correct_cluster_labels
+from clusterings import cluster_k_means, cluster_agglomerative, cluster_gmm, cluster_k_means_modified
 import glob
 import os
 
-
-def correct_cluster_labels(G, cluster_labels):
-    all_nodes = list(G)
-    np_labels = np.zeros(len(all_nodes))
-    for i in range(len(all_nodes)):
-        np_labels[int(all_nodes[i])] = cluster_labels[i]
-    return np_labels
-
-
-def score_function(clustered, k, G, logger):
-    equal_partition = G.number_of_nodes()/k
-    logger.info('Ideal balanced clusters: %.10f' % (equal_partition))
-    logger.info('Getting score for the clustering')
-    k_score = []
-    # Iterate over the k clusters
-    for i in range(k):
-        # Get the nodes that were classified as the cluster k
-        indexes = np.where(clustered == i)[0]
-        cluster_size = len(indexes)
-        logger.info('Cluster: %d. Number of nodes: %d' % (i, cluster_size))
-        edge_diff_cluster = 0
-        # Iterate over the nodes in cluster k
-        for idx in indexes:
-            node_cluster = clustered[idx]
-            # Iterate over the neighbors of the node
-            for neigh in G[str(idx)]:
-                neigh_cluster = clustered[int(neigh)]
-                # Check if the neighbor is in the same cluster as current node
-                if node_cluster != neigh_cluster:
-                    edge_diff_cluster += 1
-        # Get the score for the cluster k. Store it
-        cluster_score = edge_diff_cluster/cluster_size
-        logger.info('Cluster: %d. Edges cutting clusters: %d' % (i, edge_diff_cluster))
-        logger.info('Cluster: %d. Score: %.10f' % (i, cluster_score))
-        k_score.append(cluster_score)
-    return sum(k_score)
 
 
 def get_stored_L_eigv(G_meta, norm, k, logger):
@@ -145,13 +109,18 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     return L, eigenval, eigenvec
 
 
-def get_clustering(G, k_eigenvec, k, clustering, L, logger):
+def get_clustering(G, k_eigenvec, k, clustering, L, n, logger):
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
-        cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+        _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+    if (clustering =='Kmeans_modified'):
+        #Cluster usign modified Kmeans
+        logger.info('To merge %d nodes per cluster' % (n))
+        cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
+        return cluster_labels
     if (clustering == "Gmm"):
         # Cluster using gmm
         cluster_labels = cluster_gmm(k_eigenvec, k, logger)
@@ -161,7 +130,6 @@ def get_clustering(G, k_eigenvec, k, clustering, L, logger):
         cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
 
     cluster_labels = correct_cluster_labels(G, cluster_labels)
-
     return cluster_labels
 
 
@@ -198,7 +166,7 @@ def compute_eigenvectors_laplacian(G, G_meta, dump, cache, k, norm_flag, logger)
     return L, k_eigenvec
 
 
-def unorm(G, G_meta, clustering, dump, cache, k, logger):
+def unorm(G, G_meta, clustering, dump, cache, k, n, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
                                                    G_meta=G_meta,
@@ -208,12 +176,12 @@ def unorm(G, G_meta, clustering, dump, cache, k, logger):
                                                    norm_flag='unorm',
                                                    logger=logger)
 
-    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, logger)
+    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, n, logger)
 
     return cluster_labels
 
 
-def norm_lap(G, G_meta, clustering, dump, cache, k, logger):
+def norm_lap(G, G_meta, clustering, dump, cache, k, n, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
                                                    G_meta=G_meta,
@@ -223,12 +191,12 @@ def norm_lap(G, G_meta, clustering, dump, cache, k, logger):
                                                    norm_flag='norm',
                                                    logger=logger)
 
-    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, logger)
+    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, n, logger)
 
     return cluster_labels
 
 
-def norm_eig(G, G_meta, clustering, dump, cache, k, logger):
+def norm_eig(G, G_meta, clustering, dump, cache, k, n, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
                                                    G_meta=G_meta,
@@ -244,22 +212,27 @@ def norm_eig(G, G_meta, clustering, dump, cache, k, logger):
     # Normalize by features (cols)
     k_eigenvec = normalize(k_eigenvec, axis=0, norm='l2')
 
-    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, logger)
+    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, n, logger)
 
     return cluster_labels
 
 
-def recursive(G, k, c, clustering, PCA, logger):
+def recursive(G, k, c, clustering, n, logger):
     if (k >= 2):
         # Get Laplacian, 2 eigenvalues and eigenvectors
-        L, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
+        _, _, k_eigenvec = laplacian_and_k_eigenval_eigenvec(G, 2, 'norm', logger)
         logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
         # Cluster using k-means and the second smallest eigenvector
         eigenvec_2 = k_eigenvec[:, 1].reshape(-1, 1)
         # eigenvec_2 = k_eigenvec
         if (clustering == 'Kmeans'):
             # Cluster using k-means
-            cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+            _, cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
+        if (clustering =='Kmeans_modified'):
+            #Cluster usign modified Kmeans
+            logger.info('To merge %d nodes per cluster' % (n))
+            cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
+            return cluster_labels
         if (clustering == "Gmm"):
             # Cluster using gmm
             cluster_labels = cluster_gmm(eigenvec_2, 2, logger)
@@ -269,10 +242,10 @@ def recursive(G, k, c, clustering, PCA, logger):
         # Nodes of the biggest cluster
         logger.debug("Graph partition")
         all_nodes = list(G)
-        n = len(all_nodes)
+        n_all = len(all_nodes)
         b_cluster = sum(cluster_labels)
         logger.info('Remaining iterations: %d.' % (k-1))
-        if (b_cluster > n/2):
+        if (b_cluster > n_all/2):
             indicator = 1
             indicator2 = 0
         else:
@@ -282,7 +255,7 @@ def recursive(G, k, c, clustering, PCA, logger):
         accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator2]
         subgraph = G.subgraph(nodes)
         c[k-1] = accepted_cluster
-        return recursive(subgraph, k-1, c, clustering, PCA, logger)
+        return recursive(subgraph, k-1, c, clustering, n, logger)
         # return c
     c[k-1] = list(G)
     return c
