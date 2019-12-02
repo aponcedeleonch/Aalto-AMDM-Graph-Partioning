@@ -91,6 +91,8 @@ Example:
 
 ### Preliminary results
 
+Using K-Means for clustering and K-eigenvectors
+
 | Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
 |---------------|---------|---------|---------|-----------|-----------|
 | ca-GrQc | 0.0835 | 0.0838 | 0.362 | 0.2305 | 2.00 |
@@ -102,6 +104,20 @@ Example:
 | soc-Epinions1 | 0.8143 | 1.085 | 10.292 | 42.05 | N/A |
 | web-NotreDame | ? | 2702.41 | 0.115 | Error | N/A |
 | roadNet-CA | ? | 4.4936 | 0.276 | ? | N/A |
+
+Using Agglomerative for clustering and K-eigenvectors
+
+| Graph | Unorm | NormLap | NormEig | Recursive | HagenKahng |
+|---------------|---------|---------|---------|-----------|-----------|
+| ca-GrQc | 0.0835 | 0.0838 | 0.0757 | 0.2305 | N/A |
+| ca-HepTh | 2.426 | 5.836 | 15.231 | ? | N/A |
+| Oregon-1 | 0.693 | 1.031 | 1.173 | ? | N/A |
+| ca-HepPh | 5.181 | 15.953 | 45.731 | ? | N/A |
+| ca-AstroPh | 14.881 | 43.256 | 174.766 | ? | N/A |
+| ca-CondMat | 28.786 | 66.055 | 197.186 | ? | N/A |
+| soc-Epinions1 | Error | Error | Error | ? | N/A |
+| web-NotreDame | ? | Error | Error | ? | N/A |
+| roadNet-CA | ? | Error | Error | ? | N/A |
 
 ### Elapsed times
 
