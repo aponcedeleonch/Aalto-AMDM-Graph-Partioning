@@ -14,8 +14,7 @@ graphs_files = {
 }
 
 algorithms = ['Unorm', 'NormLap', 'NormEig', 'HagenKahng', 'Recursive']
-clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified',
-              'Merge_clusters']
+clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified']
 
 OUT_FOLDER = './outputs'
 COMP_FOLDER = './computed'

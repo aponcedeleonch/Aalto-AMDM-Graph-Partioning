@@ -186,12 +186,23 @@ def merge_clusters(G, final_k, node_cluster, num_clusters, merge_need, logger):
     return merge_clusters(G, final_k, re_index_node_clusters, num_clusters-1, merge_need-1, logger)
 
 
-def multi_merger(G, k_eig, k, logger):
+def multi_merger(G, k_eig, k, clustering, logger):
     logger.info('Merging clusters until getting K')
     num_k_eig = k_eig.shape[-1]
     logger.info('Number of eigenvectors received: %d' % (num_k_eig))
 
-    _, cluster_labels = cluster_k_means(k_eig, num_k_eig, logger)
+    logger.info('Using %s to make initial cluster for multi-merger' % (clustering))
+    if (clustering == 'Kmeans'):
+        # Cluster using k-means
+        _, cluster_labels = cluster_k_means(k_eig, num_k_eig, logger)
+    elif (clustering == "Gmm"):
+        # Cluster using gmm
+        cluster_labels = cluster_gmm(k_eig, num_k_eig, logger)
+    elif (clustering == "Agglomerative"):
+        cluster_labels = cluster_agglomerative(k_eig, num_k_eig, logger)
+    else:
+        raise ValueError('Cannot multi merge cluster with: %s' % (clustering))
+
     cluster_labels = correct_cluster_labels(G, cluster_labels)
 
     logger.info('Making dictionary with cluster labels')

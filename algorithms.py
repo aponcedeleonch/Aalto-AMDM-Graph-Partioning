@@ -109,31 +109,30 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     return L, eigenval, eigenvec
 
 
-def get_clustering(G, k_eigenvec, k, clustering, L, n, logger):
+def get_clustering(G, k_eigenvec, k, clustering, L, n, merge, logger):
     logger.info('Calling clustering: %s' % (clustering))
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
-    if (clustering == 'Kmeans'):
-        # Cluster using k-means
-        _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
-    if (clustering == 'Kmeans_modified'):
-        # Cluster usign modified Kmeans
-        logger.info('To merge %d nodes per cluster' % (n))
-        cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
-        return cluster_labels
-    if (clustering == "Gmm"):
-        # Cluster using gmm
-        cluster_labels = cluster_gmm(k_eigenvec, k, logger)
-    if (clustering == "Agglomerative"):
-        # Cluster using agglomerative algorithm
-        # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
-        A = nx.adjacency_matrix(G)
-        cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, A)
-    if (clustering == "Merge_clusters"):
-        # Cluster using agglomerative algorithm
-        # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
-        cluster_labels = multi_merger(G, k_eigenvec, k, logger)
+    if not merge:
+        if (clustering == 'Kmeans'):
+            # Cluster using k-means
+            _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
+        if (clustering == 'Kmeans_modified'):
+            # Cluster usign modified Kmeans
+            logger.info('To merge %d nodes per cluster' % (n))
+            cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
+            return cluster_labels
+        if (clustering == "Gmm"):
+            # Cluster using gmm
+            cluster_labels = cluster_gmm(k_eigenvec, k, logger)
+        if (clustering == "Agglomerative"):
+            # Cluster using agglomerative algorithm
+            # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
+            A = nx.adjacency_matrix(G)
+            cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, A)
+    else:
+        cluster_labels = multi_merger(G, k_eigenvec, k, clustering, logger)
         return cluster_labels
 
     cluster_labels = correct_cluster_labels(G, cluster_labels)
@@ -173,7 +172,7 @@ def compute_eigenvectors_laplacian(G, G_meta, dump, cache, k, norm_flag, logger)
     return L, k_eigenvec
 
 
-def unorm(G, G_meta, clustering, dump, cache, k, n, logger):
+def unorm(G, G_meta, clustering, dump, cache, k, n, merge, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
                                                    G_meta=G_meta,
@@ -183,12 +182,14 @@ def unorm(G, G_meta, clustering, dump, cache, k, n, logger):
                                                    norm_flag='unorm',
                                                    logger=logger)
 
-    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, n, logger)
+    cluster_labels = get_clustering(G=G, k_eigenvec=k_eigenvec, k=G_meta['k'],
+                                    clustering=clustering, L=L, n=n,
+                                    merge=merge, logger=logger)
 
     return cluster_labels
 
 
-def norm_lap(G, G_meta, clustering, dump, cache, k, n, logger):
+def norm_lap(G, G_meta, clustering, dump, cache, k, n, merge, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
                                                    G_meta=G_meta,
@@ -198,12 +199,14 @@ def norm_lap(G, G_meta, clustering, dump, cache, k, n, logger):
                                                    norm_flag='norm',
                                                    logger=logger)
 
-    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, n, logger)
+    cluster_labels = get_clustering(G=G, k_eigenvec=k_eigenvec, k=G_meta['k'],
+                                    clustering=clustering, L=L, n=n,
+                                    merge=merge, logger=logger)
 
     return cluster_labels
 
 
-def norm_eig(G, G_meta, clustering, dump, cache, k, n, logger):
+def norm_eig(G, G_meta, clustering, dump, cache, k, n, merge, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
                                                    G_meta=G_meta,
@@ -219,7 +222,9 @@ def norm_eig(G, G_meta, clustering, dump, cache, k, n, logger):
     # Normalize by features (cols)
     k_eigenvec = normalize(k_eigenvec, axis=0, norm='l2')
 
-    cluster_labels = get_clustering(G, k_eigenvec, G_meta['k'], clustering, L, n, logger)
+    cluster_labels = get_clustering(G=G, k_eigenvec=k_eigenvec, k=G_meta['k'],
+                                    clustering=clustering, L=L, n=n,
+                                    merge=merge, logger=logger)
 
     return cluster_labels
 
