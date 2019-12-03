@@ -14,10 +14,11 @@ graphs_files = {
 }
 
 algorithms = ['Unorm', 'NormLap', 'NormEig', 'HagenKahng', 'Recursive']
-clustering = ['Kmeans', 'Gmm', 'Agglomerative','Kmeans_modified']
+clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified']
 
 OUT_FOLDER = './outputs'
 COMP_FOLDER = './computed'
+
 
 def score_function(clustered, k, G, logger):
     equal_partition = G.number_of_nodes()/k
@@ -46,6 +47,7 @@ def score_function(clustered, k, G, logger):
         logger.debug('Cluster: %d. Score: %.10f' % (i, cluster_score))
         k_score.append(cluster_score)
     return sum(k_score)
+
 
 def correct_cluster_labels(G, cluster_labels):
     all_nodes = list(G)

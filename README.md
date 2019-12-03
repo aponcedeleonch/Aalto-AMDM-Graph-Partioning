@@ -101,7 +101,7 @@ Using K-Means for clustering and K-eigenvectors
 | ca-HepPh | 5.578 | 15.280 | 59.487 | 51.484 | N/A |
 | ca-AstroPh | 15.563 | 40.994 | 221.916 | 73.273 | N/A |
 | ca-CondMat | 30.180 | 68.223 | 215.75 | Error | N/A |
-| soc-Epinions1 | 0.8143 | 1.085 | 10.292 | 42.05 | N/A |
+| soc-Epinions1 | 0.7548 | 1.085 | 10.292 | 42.05 | N/A |
 | web-NotreDame | ? | 2702.41 | 0.115 | Error | N/A |
 | roadNet-CA | ? | 4.4936 | 0.276 | ? | N/A |
 
@@ -123,9 +123,9 @@ Graph competition
 
 | Graph | Personal Best | Min Top 10
 |---------------|---------------|---------------|
-| ca-GrQc | 0.0757 | 0.0627 |
+| ca-GrQc | 0.0627 | 0.0627 |
 | Oregon-1 | 0.6003 | 0.6392 |
-| soc-Epinions1 | 0.8143 | 0.7548 |
+| soc-Epinions1 | 0.7548 | 0.7548 |
 | web-NotreDame | 0.1151 | 0.0778 |
 | roadNet-CA | 0.2762 | 0.2663 |
 
