@@ -4,10 +4,10 @@ import numpy as np
 import networkx as nx
 import pickle
 from resources import COMP_FOLDER, score_function, correct_cluster_labels
-from clusterings import cluster_k_means, cluster_agglomerative, cluster_gmm, cluster_k_means_modified
+from clusterings import (cluster_k_means, cluster_agglomerative, cluster_gmm,
+                         cluster_k_means_modified, multi_merger)
 import glob
 import os
-
 
 
 def get_stored_L_eigv(G_meta, norm, k, logger):
@@ -110,14 +110,15 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
 
 
 def get_clustering(G, k_eigenvec, k, clustering, L, n, logger):
+    logger.info('Calling clustering: %s' % (clustering))
     logger.debug("Shape of K eigenvector matrix: %s" % (k_eigenvec.shape, ))
     logger.debug('K-Eigenvectors')
     logger.debug(k_eigenvec)
     if (clustering == 'Kmeans'):
         # Cluster using k-means
         _, cluster_labels = cluster_k_means(k_eigenvec, k, logger)
-    if (clustering =='Kmeans_modified'):
-        #Cluster usign modified Kmeans
+    if (clustering == 'Kmeans_modified'):
+        # Cluster usign modified Kmeans
         logger.info('To merge %d nodes per cluster' % (n))
         cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
         return cluster_labels
@@ -129,6 +130,11 @@ def get_clustering(G, k_eigenvec, k, clustering, L, n, logger):
         # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
         A = nx.adjacency_matrix(G)
         cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, A)
+    if (clustering == "Merge_clusters"):
+        # Cluster using agglomerative algorithm
+        # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
+        cluster_labels = multi_merger(G, k_eigenvec, k, logger)
+        return cluster_labels
 
     cluster_labels = correct_cluster_labels(G, cluster_labels)
     return cluster_labels

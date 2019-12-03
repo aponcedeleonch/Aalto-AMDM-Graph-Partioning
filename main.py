@@ -27,12 +27,11 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         type=str, help="Indicate clustering", default="Kmeans",
                         choices=clustering)
     parser.add_argument("--nodes", "-n",
-                        type=int, help="Nodes to mergge in modified Kmans", default=3)                
+                        type=int, help="Nodes to mergge in modified Kmans", default=3)
     # Use more than k eigenvectors to run the clustering
     parser.add_argument("--k_custom", "-k",
                         type=int, default=None,
                         help="Indicate a custom number of k to get eigenvectors")
-
     # Argument to print to console
     parser.add_argument("--log", "-l",
                         type=str, help="Set logging level", default="INFO",
@@ -48,7 +47,6 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--no_cache",
                         action="store_true",
                         help="Fore recalculation of eigenvectos and Laplacian")
-    
     return parser.parse_args(args)
 
 
@@ -161,7 +159,7 @@ if __name__ == '__main__':
     # Make a folder to store the eigenvectors
     os.makedirs(COMP_FOLDER, exist_ok=True)
 
-   # In case there was a different number of k values specified
+    # In case there was a different number of k values specified
     k = G_meta['k']
     if args.k_custom is not None:
         k = args.k_custom
