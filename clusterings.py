@@ -105,7 +105,7 @@ def cluster_gmm(k_eig, k, logger):
     return labels
 
 
-def merge_clusters(G, node_cluster, num_clusters, merge_need, logger):
+def merge_clusters(G, final_k, node_cluster, num_clusters, merge_need, logger):
     logger.info('Number of merges to go: %d' % (merge_need))
 
     if merge_need == 0:
@@ -114,20 +114,49 @@ def merge_clusters(G, node_cluster, num_clusters, merge_need, logger):
 
     logger.info('Getting the number of cutting edges between all the clusters')
     cutting_edges = np.zeros((num_clusters, num_clusters))
+    cluster_sizes = {}
     for node, cluster in node_cluster.items():
+        # Count the sizes of the clusters
+        if cluster in cluster_sizes:
+            cluster_sizes[cluster] += 1
+        else:
+            cluster_sizes[cluster] = 1
         for neigh in G[str(node)]:
             cluster_of_neigh = int(node_cluster[int(neigh)])
             cluster_of_node = int(cluster)
             if cluster_of_neigh != cluster_of_node:
                 cutting_edges[cluster_of_node, cluster_of_neigh] += 1
 
+    logger.debug('Symmetrical matrix. Getting only upper part')
+    cutting_edges = np.triu(cutting_edges)
     max_cutting_edges = cutting_edges.max()
     max_cutting_edges_pos = np.argwhere(max_cutting_edges == cutting_edges)
     logger.info('Max number of cutting edges between clusters: %d' % (max_cutting_edges))
     logger.info('Clusters with max edges cutting: %s' % (max_cutting_edges_pos, ))
-    logger.info('Selecting the first one')
 
-    merge = max_cutting_edges_pos[0]
+    # If we have more than one cluster with the same amount of cutting
+    if len(max_cutting_edges_pos) > 1:
+        logger.info('More than one cluster with max cutting edges')
+        equal_partition = G.number_of_nodes()/final_k
+        logger.info('Equal partition should be: %.3f' % (equal_partition))
+        distances = []
+        for max_edge in max_cutting_edges_pos:
+            cluster_1_size = cluster_sizes[max_edge[0]]
+            cluster_2_size = cluster_sizes[max_edge[1]]
+            sizes_combined = cluster_1_size + cluster_2_size
+            distance_ideal = abs(equal_partition - sizes_combined)
+            logger.info('Cluster: %d. Size: %d' % (max_edge[0], cluster_1_size))
+            logger.info('Cluster: %d. Size: %d' % (max_edge[1], cluster_2_size))
+            logger.info('Distance from ideal: %d' % (distance_ideal))
+            distances.append(distance_ideal)
+        distances = np.array(distances)
+        logger.info('Distance from each merging to ideal: %s' % (distances, ))
+        idx_merge = np.argmin(distances)
+        logger.info('Choosing to merge clusters in index: %d' % (idx_merge))
+    else:
+        # There is only one element with max cutting edges
+        idx_merge = 0
+    merge = max_cutting_edges_pos[idx_merge]
 
     new_node_clusters = {}
     for node, cluster in node_cluster.items():
@@ -154,7 +183,7 @@ def merge_clusters(G, node_cluster, num_clusters, merge_need, logger):
                     re_index_node_clusters[node] = i
     logger.info('Re-indexing finished')
 
-    return merge_clusters(G, re_index_node_clusters, num_clusters-1, merge_need-1, logger)
+    return merge_clusters(G, final_k, re_index_node_clusters, num_clusters-1, merge_need-1, logger)
 
 
 def multi_merger(G, k_eig, k, logger):
@@ -176,7 +205,7 @@ def multi_merger(G, k_eig, k, logger):
     need_merge = num_k_eig - k
     logger.info('Number of merges needed: %d' % (need_merge))
 
-    node_cluster = merge_clusters(G, node_cluster, num_k_eig, need_merge, logger)
+    node_cluster = merge_clusters(G, k, node_cluster, num_k_eig, need_merge, logger)
     num_nodes = len(node_cluster.keys())
     logger.info('Number of nodes merged: %d' % (num_nodes))
 

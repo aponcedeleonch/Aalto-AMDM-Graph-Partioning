@@ -123,7 +123,7 @@ Graph competition
 
 | Graph | Personal Best | Min Top 10
 |---------------|---------------|---------------|
-| ca-GrQc | 0.0757 | 0.0627 |
+| ca-GrQc | 0.0627 | 0.0627 |
 | Oregon-1 | 0.6003 | 0.6392 |
 | soc-Epinions1 | 0.7548 | 0.7548 |
 | web-NotreDame | 0.1151 | 0.0778 |
