@@ -74,8 +74,13 @@ def get_graph(graph_file, logger):
     # Construct the graph with the rest of lines
     logger.info('Constructing graph')
     file_graph = lines[1:]
+    # Getting the edges from file
     file_graph = [line.split(' ') for line in file_graph]
     G = nx.Graph()
+    # Forcing correct node order in graph
+    for i in range(graph_meta['vertices']):
+        G.add_node(str(i))
+    # Adding edges to graph
     G.add_edges_from(file_graph)
 
     return graph_meta, G
