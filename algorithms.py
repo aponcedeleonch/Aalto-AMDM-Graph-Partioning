@@ -104,6 +104,10 @@ def laplacian_and_k_eigenval_eigenvec(G, k, norm_decide, logger):
     # Note use of function eigsh over eig.
     # eigsh for real symmetric matrix and only k values
     eigenval, eigenvec = sparse.linalg.eigsh(L_double, which='SM', k=k, ncv=5*k)
+    logger.debug('k')
+    logger.debug(k)
+    logger.debug('Eigenvalues')
+    logger.debug(eigenval)
 
     logger.info('Finished. Returning eigenvalues, eigenvectors and Laplacian')
     return L, eigenval, eigenvec
