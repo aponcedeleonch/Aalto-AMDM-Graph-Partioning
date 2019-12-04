@@ -136,7 +136,7 @@ def get_clustering(G, k_eigenvec, k, clustering, L, n, merge, logger):
             A = nx.adjacency_matrix(G)
             cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, A)
     else:
-        cluster_labels = multi_merger(G, k_eigenvec, k, clustering, logger)
+        cluster_labels = multi_merger(G, k_eigenvec, k, clustering, n, logger)
         return cluster_labels
 
     cluster_labels = correct_cluster_labels(G, cluster_labels)

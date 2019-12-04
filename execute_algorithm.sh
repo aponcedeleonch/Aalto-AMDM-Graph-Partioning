@@ -4,128 +4,168 @@ GRAPH=$1
 KMAX=$2
 N=$3
 
-echo "Started execution of graph $GRAPH with algorithm NormEig, Kmeans and k=$KMAX\n"
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means and merge\n"
+
 python main.py -g $GRAPH -a NormEig -c Kmeans -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig, Kmeans and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Kmeans and k=$KMAX\n"
 python main.py -g $GRAPH -a NormLap -c Kmeans -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Kmeans and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Kmeans and k=$KMAX\n"
 python main.py -g $GRAPH -a NormEigCol -c Kmeans -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Kmeans and k=$KMAX\n\n"
 
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig\n"
 python main.py -g $GRAPH -a NormEig -c Kmeans -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Kmeans\n"
 python main.py -g $GRAPH -a NormLap -c Kmeans -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Kmeans\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Kmeans\n"
 python main.py -g $GRAPH -a NormEigCol -c Kmeans -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Kmeans\n\n"
 
-echo "====="
+now=$(date +"%T")
+echo $now
+echo "Executing all with Gmm and merge\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig, Gmm and k=$KMAX\n"
 python main.py -g $GRAPH -a NormEig -c Gmm -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig, Gmm and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Gmm and k=$KMAX\n"
 python main.py -g $GRAPH -a NormLap -c Gmm -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Gmm and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Gmm and k=$KMAX\n"
 python main.py -g $GRAPH -a NormEigCol -c Gmm -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Gmm and k=$KMAX\n\n"
 
+now=$(date +"%T")
+echo $now
+echo "Executing all with Gmm\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig\n"
 python main.py -g $GRAPH -a NormEig -c Gmm -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Gmm\n"
 python main.py -g $GRAPH -a NormLap -c Gmm -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Gmm\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Gmm\n"
 python main.py -g $GRAPH -a NormEigCol -c Gmm -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Gmm\n\n"
 
-echo "====="
+now=$(date +"%T")
+echo $now
+echo "Executing all with Agglomerative and merge\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig, Agglomerative and k=$KMAX\n"
 python main.py -g $GRAPH -a NormEig -c Agglomerative -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig, Agglomerative and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Agglomerative and k=$KMAX\n"
 python main.py -g $GRAPH -a NormLap -c Agglomerative -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Agglomerative and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Agglomerative and k=$KMAX\n"
 python main.py -g $GRAPH -a NormEigCol -c Agglomerative -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Agglomerative and k=$KMAX\n\n"
 
+now=$(date +"%T")
+echo $now
+echo "Executing all with Agglomerative\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig\n"
 python main.py -g $GRAPH -a NormEig -c Agglomerative -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Agglomerative\n"
 python main.py -g $GRAPH -a NormLap -c Agglomerative -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Agglomerative\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Agglomerative\n"
 python main.py -g $GRAPH -a NormEigCol -c Agglomerative -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Agglomerative\n\n"
 
-echo "====="
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means modified and merge\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig\n"
+python main.py -g $GRAPH -a NormEig -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log
+python main.py -g $GRAPH -a NormLap -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log
+python main.py -g $GRAPH -a NormEigCol -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means modified\n"
+
 python main.py -g $GRAPH -a NormEig -c Kmeans_modified -n $N -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormLap, Kmeans_modified\n"
 python main.py -g $GRAPH -a NormLap -c Kmeans_modified -n $N -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormLap, Kmeans_modified\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEigCol, Kmeans_modified\n"
 python main.py -g $GRAPH -a NormEigCol -c Kmeans_modified -n $N -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEigCol, Kmeans_modified\n\n"
 
-echo "====="
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means and merge and dumping\n"
 
-echo "Started execution of graph $GRAPH with algorithm NormEig, Kmeans and k=$KMAX\n"
+python main.py -g $GRAPH -a NormEig -c Kmeans -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Kmeans -k $KMAX -m -f $GRAPH.log  --dump
+python main.py -g $GRAPH -a NormEigCol -c Kmeans -k $KMAX -m -f $GRAPH.log  --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Kmeans -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Kmeans -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Kmeans -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with Gmm and merge and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Gmm -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Gmm -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Gmm -k $KMAX -m -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with Gmm and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Gmm -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Gmm -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Gmm -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with Agglomerative and merge and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Agglomerative -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Agglomerative -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Agglomerative -k $KMAX -m -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with Agglomerative and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Agglomerative -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Agglomerative -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Agglomerative -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means modified and merge and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing all with K means modified and dumping\n"
+
+python main.py -g $GRAPH -a NormEig -c Kmeans_modified -n $N -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormLap -c Kmeans_modified -n $N -f $GRAPH.log --dump
+python main.py -g $GRAPH -a NormEigCol -c Kmeans_modified -n $N -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing unormalized with merge\n"
+
 python main.py -g $GRAPH -a Unorm -c Kmeans -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm Unorm, Kmeans and k=$KMAX\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm Unorm\n"
-python main.py -g $GRAPH -a Unorm -c Kmeans -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm Unorm\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm Unorm, Gmm and k=$KMAX\n"
+python main.py -g $GRAPH -a Unorm -c Agglomerative -k $KMAX -m -f $GRAPH.log
 python main.py -g $GRAPH -a Unorm -c Gmm -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm Unorm, Gmm and k=$KMAX\n\n"
+python main.py -g $GRAPH -a Unorm -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log
 
-echo "Started execution of graph $GRAPH with algorithm Unorm\n"
-python main.py -g $GRAPH -a Unorm -c Gmm -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm Unorm\n\n"
+now=$(date +"%T")
+echo $now
+echo "Executing unormalized with K means\n"
 
-echo "Started execution of graph $GRAPH with algorithm Unorm\n"
+python main.py -g $GRAPH -a Unorm -c Kmeans -f $GRAPH.log
 python main.py -g $GRAPH -a Unorm -c Agglomerative -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm Unorm\n\n"
-
-echo "Started execution of graph $GRAPH with algorithm NormEig, Agglomerative and k=$KMAX\n"
-python main.py -g $GRAPH -a NormEig -c Agglomerative -k $KMAX -m -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm NormEig, Agglomerative and k=$KMAX\n\n"
-
-echo "====="
-
-echo "Started execution of graph $GRAPH with algorithm NormEig, Kmeans and k=$KMAX\n"
+python main.py -g $GRAPH -a Unorm -c Gmm -f $GRAPH.log
 python main.py -g $GRAPH -a Unorm -c Kmeans_modified -n $N -f $GRAPH.log
-echo "\nFinished execution of graph $GRAPH with algorithm Unorm, Kmeans and k=$KMAX\n\n"
+
+now=$(date +"%T")
+echo $now
+echo "Executing unormalized with merge and dumping\n"
+
+python main.py -g $GRAPH -a Unorm -c Kmeans -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a Unorm -c Agglomerative -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a Unorm -c Gmm -k $KMAX -m -f $GRAPH.log --dump
+python main.py -g $GRAPH -a Unorm -c Kmeans_modified -k $KMAX -m -n $N -f $GRAPH.log --dump
+
+now=$(date +"%T")
+echo $now
+echo "Executing unormalized with K means and dumping\n"
+
+python main.py -g $GRAPH -a Unorm -c Kmeans -f $GRAPH.log --dump
+python main.py -g $GRAPH -a Unorm -c Agglomerative -f $GRAPH.log --dump
+python main.py -g $GRAPH -a Unorm -c Gmm -f $GRAPH.log --dump
+python main.py -g $GRAPH -a Unorm -c Kmeans_modified -n $N -f $GRAPH.log --dump
+
 
