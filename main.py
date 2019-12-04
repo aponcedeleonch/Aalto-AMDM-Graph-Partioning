@@ -145,25 +145,7 @@ def run_algorithm(G, G_meta, algo, clustering, dump, cache, k, n, merge, logger)
     return cluster_labels
 
 
-if __name__ == '__main__':
-    start_time = time.time()
-    # Read arguments from console
-    args = parse_args(list(graphs_files.keys()))
-    # Get a logger of the events
-    numeric_log_level = getattr(logging, args.log, None)
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)s: %(message)s',
-        datefmt='%m/%d/%Y %H:%M:%S %p',
-        level=numeric_log_level,
-        handlers=[
-            logging.FileHandler(args.file),
-            logging.StreamHandler()
-        ]
-    )
-    logger = logging.getLogger()
-    logger.info('Logger ready. Logging to file: %s' % (args.file))
-    # Read from the text file
-    logger.info('Reading graph from file: %s' % (graphs_files[args.graph]))
+def main(logger):
     graph_file_content = ''
     with open(graphs_files[args.graph], 'r') as file:
         graph_file_content = file.read()
@@ -206,3 +188,28 @@ if __name__ == '__main__':
     logger.info('Elapsed time of execution: %.10f' % (end_time - start_time))
     logger.info('Output file: %s' % (out_path))
     logger.info('*************************************')
+
+
+if __name__ == '__main__':
+    start_time = time.time()
+    # Read arguments from console
+    args = parse_args(list(graphs_files.keys()))
+    # Get a logger of the events
+    numeric_log_level = getattr(logging, args.log, None)
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)s: %(message)s',
+        datefmt='%m/%d/%Y %H:%M:%S %p',
+        level=numeric_log_level,
+        handlers=[
+            logging.FileHandler(args.file),
+            logging.StreamHandler()
+        ]
+    )
+    logger = logging.getLogger()
+    logger.info('Logger ready. Logging to file: %s' % (args.file))
+    # Read from the text file
+    logger.info('Reading graph from file: %s' % (graphs_files[args.graph]))
+    try:
+        main(logger)
+    except Exception:
+        logger.exception("Fatal error in main loop")
