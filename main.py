@@ -27,10 +27,11 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         type=str, help="Indicate clustering", default="Kmeans",
                         choices=clustering)
     parser.add_argument("--nodes", "-n",
-                        type=int, help="Nodes to mergge in modified Kmans", default=3)
+                        type=int, default=0,
+                        help="Nodes to mergge in modified Kmans")
     # Use more than k eigenvectors to run the clustering
     parser.add_argument("--k_custom", "-k",
-                        type=int, default=None,
+                        type=int, default=0,
                         help="Indicate a custom number of k to get eigenvectors")
     # Merge clusters
     parser.add_argument("--merge", "-m",
@@ -159,7 +160,7 @@ def main(logger):
 
     # In case there was a different number of k values specified
     k = G_meta['k']
-    if args.k_custom is not None:
+    if args.k_custom != 0:
         k = args.k_custom
 
     cluster_labels = run_algorithm(G=G, G_meta=G_meta, algo=args.algo,
@@ -183,6 +184,10 @@ def main(logger):
     logger.info('************** Summary **************')
     logger.info('Graph: %s' % (G_meta['name']))
     logger.info('Algorithm used: %s' % (args.algo))
+    logger.info('N to merge: %d' % (args.nodes))
+    logger.info('K custom: %d' % (args.k_custom))
+    logger.info('Dumping?: %s' % (args.dump))
+    logger.info('Merging?: %s' % (args.merge))
     logger.info('Clustering algorithm used: %s' % (args.cluster))
     logger.info('Score of execution: %.10f' % (score))
     logger.info('Elapsed time of execution: %.10f' % (end_time - start_time))

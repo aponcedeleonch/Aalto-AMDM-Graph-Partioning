@@ -48,7 +48,7 @@ def merge_nodes(G, n, k_eig, k, cluster_labels, cluster_centers, closest_cluster
             node = int(nodes_to_merge[j])
             labels[i][node] = combinations[i][j]
         labels[i] = correct_cluster_labels(G, labels[i])
-        if (i % int(n_labels/10) == 0):
+        if (i % int(n_labels/4) == 0):
             logger.info('Grading combination %d.' % (i))
         prov_score = score_function(labels[i], k, G, logger)
         scores.append(prov_score)
