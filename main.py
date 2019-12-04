@@ -8,7 +8,7 @@ import logging
 import time
 import os
 from algorithms import (unorm, norm_lap, norm_eig, recursive, hagen_kahng,
-                        score_function)
+                        score_function, norm_eig_col)
 
 # Parse script arguments
 def parse_args(graph_names, args=sys.argv[1:]):
@@ -124,6 +124,10 @@ def run_algorithm(G, G_meta, algo, clustering, dump, cache, k, n, merge, logger)
         cluster_labels = norm_eig(G=G, G_meta=G_meta, clustering=clustering,
                                   dump=dump, cache=cache, k=k, n=n, merge=merge,
                                   logger=logger)
+    elif(algo == 'NormEigCol'):
+        cluster_labels = norm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
+                                      dump=dump, cache=cache, k=k, n=n, merge=merge,
+                                      logger=logger)
     elif(algo == 'Recursive'):
         # Empty dictionary to track  labels
         k = G_meta['k']

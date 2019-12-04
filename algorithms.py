@@ -146,17 +146,22 @@ def get_clustering(G, k_eigenvec, k, clustering, L, n, merge, logger):
 def compute_eigenvectors_laplacian(G, G_meta, dump, cache, k, norm_flag, logger):
     # Get Laplacian, k eigenvalues and eigenvectors of it
     L, k_eigenvec = get_stored_L_eigv(G_meta, norm_flag, k, logger)
-    compute = False
 
+    compute = False
     if cache:
         compute = True
     else:
         if k_eigenvec is None:
             compute = True
         else:
-            if k_eigenvec.shape[-1] < k+1:
-                compute = True
-                logger.info('Not enough stored eigenvectors')
+            if dump:
+                if k_eigenvec.shape[-1] < k+1:
+                    compute = True
+                    logger.info('Not enough stored eigenvectors')
+            else:
+                if k_eigenvec.shape[-1] < k:
+                    compute = True
+                    logger.info('Not enough stored eigenvectors')
 
     if compute:
         logger.info('Going to compute Laplacian and eigenvectors')
@@ -220,7 +225,28 @@ def norm_eig(G, G_meta, clustering, dump, cache, k, n, merge, logger):
                                                    norm_flag='norm',
                                                    logger=logger)
 
-    logger.info('Normalizing eigenvector matrix')
+    logger.info('Normalizing eigenvector matrix by rows')
+    # Normalize by samples (rows)
+    k_eigenvec = normalize(k_eigenvec, axis=1, norm='l2')
+
+    cluster_labels = get_clustering(G=G, k_eigenvec=k_eigenvec, k=G_meta['k'],
+                                    clustering=clustering, L=L, n=n,
+                                    merge=merge, logger=logger)
+
+    return cluster_labels
+
+
+def norm_eig_col(G, G_meta, clustering, dump, cache, k, n, merge, logger):
+    # Get Laplacian, k eigenvalues and eigenvectors of it
+    L, k_eigenvec = compute_eigenvectors_laplacian(G=G,
+                                                   G_meta=G_meta,
+                                                   dump=dump,
+                                                   cache=cache,
+                                                   k=k,
+                                                   norm_flag='norm',
+                                                   logger=logger)
+
+    logger.info('Normalizing eigenvector matrix by rows and cols')
     # Normalize by samples (rows)
     k_eigenvec = normalize(k_eigenvec, axis=1, norm='l2')
     # Normalize by features (cols)
