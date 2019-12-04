@@ -11,7 +11,8 @@ def get_nodes_to_merge(k_eig, cluster_centers, cluster_labels, closest_clusters,
     for i in range(2):
         # Select nodes
         cluster_idx = [idx for idx, val in enumerate(cluster_labels) if val == closest_clusters[0, i]]
-        cluster_arr = np.zeros((len(cluster_idx), k))
+        k_given = k_eig.shape[1]
+        cluster_arr = np.zeros((len(cluster_idx), k_given))
         # Build arrays of clusters
         for index, value in enumerate(cluster_idx):
             cluster_arr[index, ] = k_eig[value, ]
@@ -40,7 +41,7 @@ def merge_nodes(G, n, k_eig, k, cluster_labels, cluster_centers, closest_cluster
     nodes_to_merge = list(itertools.chain.from_iterable(nodes_to_merge))
     combinations = [i for i in itertools.product([closest_clusters[0, 0], closest_clusters[0, 1]], repeat=2*n)]
     n_labels = len(combinations)
-    logger.info('Grading %d combinations' % (n_labels))
+    logger.info('To grade %d combinations' % (n_labels))
     for i in range(n_labels):
         labels.append(cluster_labels)
         for j in range(2*n):

@@ -22,7 +22,7 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--algo", "-a",
                         type=str, help="Indicate normalization", default="Unorm",
                         choices=algorithms)
-    # Use different algorithms to run the script
+    # Use different cluster algorithms to run the script
     parser.add_argument("--cluster", "-c",
                         type=str, help="Indicate clustering", default="Kmeans",
                         choices=clustering)
@@ -32,7 +32,7 @@ def parse_args(graph_names, args=sys.argv[1:]):
     parser.add_argument("--k_custom", "-k",
                         type=int, default=None,
                         help="Indicate a custom number of k to get eigenvectors")
-    # Use more than k eigenvectors to run the clustering
+    # Merge clusters
     parser.add_argument("--merge", "-m",
                         action="store_true",
                         help="If there is a k_custom then merge manually the extra clusters")
@@ -50,7 +50,7 @@ def parse_args(graph_names, args=sys.argv[1:]):
     # Flag to force the re-calculate eigenvector and laplacian
     parser.add_argument("--no_cache",
                         action="store_true",
-                        help="Fore recalculation of eigenvectos and Laplacian")
+                        help="For recalculation of eigenvectos and Laplacian")
     return parser.parse_args(args)
 
 
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     logger.info('************** Summary **************')
     logger.info('Graph: %s' % (G_meta['name']))
     logger.info('Algorithm used: %s' % (args.algo))
-    logger.info('Clustering algoirhtm used: %s' % (args.cluster))
+    logger.info('Clustering algorithm used: %s' % (args.cluster))
     logger.info('Score of execution: %.10f' % (score))
     logger.info('Elapsed time of execution: %.10f' % (end_time - start_time))
     logger.info('Output file: %s' % (out_path))
