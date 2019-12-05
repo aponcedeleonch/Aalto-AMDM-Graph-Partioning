@@ -13,8 +13,8 @@ graphs_files = {
     'dummy': 'graphs_processed/dummy.txt'
 }
 
-algorithms = ['HagenKahng', 'Recursive']
-laplacians = ['Unorm', 'Norm']
+algorithms = ['HagenKahng', 'Recursive', 'LaplacianEigenvectors']
+laplacians = ['Unorm', 'Norm', 'RW']
 eigenvectors = ['None', 'Norm', 'NormCol']
 clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified']
 merges = ['edges', 'size']

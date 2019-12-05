@@ -81,6 +81,7 @@ def cluster_k_means_modified(G, n, k_eig, k, logger):
 def cluster_k_means(k_eig, k, logger):
     logger.info('Using k-means to cluster the vertices')
     kmeans = KMeans(n_clusters=k).fit(k_eig)
+    # kmeans = KMeans(n_clusters=k, init='random', n_init=100).fit(k_eig)
     logger.info('K-means finished. Returning the results')
     return kmeans.cluster_centers_, kmeans.labels_
 

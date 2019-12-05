@@ -7,8 +7,7 @@ import numpy as np
 import logging
 import time
 import os
-from algorithms import (unorm, norm_lap, norm_eig, recursive, hagen_kahng,
-                        score_function, norm_eig_col, unorm_eig, unorm_eig_col)
+from algorithms import (recursive, hagen_kahng, score_function, laplacian_eig_algorithm)
 
 
 # Parse script arguments
@@ -19,14 +18,6 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         type=str, required=True,
                         help="Graph to execute the algorithm",
                         choices=graph_names)
-    # Use different laplacians to run the script
-    parser.add_argument("--laplacian", "-l",
-                        type=str, help='Type of Laplacian to compute',
-                        required=True, choices=laplacians)
-    # Use different eigenvectors to run the script
-    parser.add_argument("--eigenvectors", "-e",
-                        type=str, help='Type of Eigenvectos to compute',
-                        required=True, choices=eigenvectors)
     # Use different cluster algorithms to run the script
     parser.add_argument("--cluster", "-c",
                         type=str, help="Indicate clustering", default="Kmeans",
@@ -34,7 +25,15 @@ def parse_args(graph_names, args=sys.argv[1:]):
     # Use different algorithms to run the script
     parser.add_argument("--algo", "-a", default='',
                         type=str, help="Indicate normalization",
-                        choices=algorithms)
+                        required=True, choices=algorithms)
+    # Use different laplacians to run the script
+    parser.add_argument("--laplacian", "-l",
+                        type=str, help='Type of Laplacian to compute',
+                        choices=laplacians)
+    # Use different eigenvectors to run the script
+    parser.add_argument("--eigenvectors", "-e",
+                        type=str, help='Type of Eigenvectos to compute',
+                        choices=eigenvectors)
     parser.add_argument("--nodes", "-n",
                         type=int, default=0,
                         help="Nodes to merge in modified Kmans")
@@ -122,41 +121,10 @@ def output_file(g_meta, clustered, logger):
 
 def run_algorithm(G, G_meta, algo, lap, eig, clustering, dump, cache,
                   k, n, merge, logger):
-    if (lap == 'Unorm'):
-        logger.info('Going to use unormalized Laplacian matrix')
-        if (eig == 'None'):
-            logger.info('Not going to normalize eigenvectors')
-            cluster_labels = unorm(G=G, G_meta=G_meta, clustering=clustering,
-                                   dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                   logger=logger)
-        elif(eig == 'Norm'):
-            logger.info('Normalize eigenvectors by row')
-            cluster_labels = unorm_eig(G=G, G_meta=G_meta, clustering=clustering,
-                                       dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                       logger=logger)
-        elif(eig == 'NormCol'):
-            logger.info('Normalize eigenvectors by col and row')
-            cluster_labels = unorm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
-                                           dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                           logger=logger)
-    elif (lap == 'Norm'):
-        logger.info('Going to use normalized Laplacian matrix')
-        if (eig == 'None'):
-            logger.info('Not going to normalize eigenvectors')
-            cluster_labels = norm_lap(G=G, G_meta=G_meta, clustering=clustering,
-                                      dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                      logger=logger)
-        elif(eig == 'Norm'):
-            logger.info('Normalize eigenvectors by row')
-            cluster_labels = norm_eig(G=G, G_meta=G_meta, clustering=clustering,
-                                      dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                      logger=logger)
-        elif(eig == 'NormCol'):
-            logger.info('Normalize eigenvectors by col and row')
-            cluster_labels = norm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
-                                          dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                          logger=logger)
-
+    if algo == 'LaplacianEigenvectors':
+        cluster_labels = laplacian_eig_algorithm(G=G, G_meta=G_meta, clustering=clustering,
+                                                 lap=lap, eig=eig, dump=dump, cache=cache,
+                                                 k=k, n=n, merge=merge, logger=logger)
     if(algo == 'Recursive'):
         logger.info('Going to execute algorithm: %s' % (algo))
         # Empty dictionary to track  labels
