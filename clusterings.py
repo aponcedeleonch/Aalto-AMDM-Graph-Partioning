@@ -153,7 +153,13 @@ def merge_clusters_edges(G, final_k, node_cluster, num_clusters, merge_need, log
             distances.append(distance_ideal)
         distances = np.array(distances)
         logger.debug('Distance from each merging to ideal: %s' % (distances, ))
-        idx_merge = np.argmin(distances)
+        min_distances = distances.min()
+        # If there is still 2 clusters with same size then choose one at random
+        if min_distances > 1:
+            idxs = list(range(len(min_distances)))
+            idx_merge = np.random.choice(idxs, size=1)
+        else:
+            idx_merge = np.argmin(distances)
         logger.debug('Choosing to merge clusters in index: %d' % (idx_merge))
     else:
         # There is only one element with max cutting edges
@@ -244,6 +250,13 @@ def merge_clusters_size(G, final_k, node_cluster, num_clusters, merge_need, logg
             logger.debug('Cutting edges: %d' % (num_edges))
             num_edges_cutting.append(num_edges)
         num_edges_cutting = np.array(num_edges_cutting)
+        max_edges_cutting = num_edges_cutting.max()
+        # If there is still 2 clusters with same number of outgoing cutting edges select random
+        if max_edges_cutting > 1:
+            idxs = list(range(len(max_edges_cutting)))
+            idx_merge = np.random.choice(idxs, size=1)
+        else:
+            idx_merge = np.argmin(distances)
         idx_merge = np.argmax(num_edges_cutting)
     else:
         # There is only one element with max cutting edges

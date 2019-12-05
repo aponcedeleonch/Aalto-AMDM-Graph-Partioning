@@ -98,7 +98,7 @@ def get_laplacian(G, lap, logger):
         logger.info('Getting Unormalized Laplacian matrix')
         L = nx.laplacian_matrix(G)
     elif 'RW' == lap:
-        logger.info('Getting Random Walk Laplacian matrix')
+        logger.info('Starting to get Random Walk Laplacian matrix')
         logger.info('Getting Adjacency matrix')
         A = nx.adjacency_matrix(G)
         logger.info('Getting Degree matrix')
@@ -113,8 +113,9 @@ def get_laplacian(G, lap, logger):
         D_1 = sparse.linalg.inv(D)
         logger.info('Getting Identity matrix')
         I = sparse.csr_matrix((np.ones(nodes), (rows_cols, rows_cols)))
-        logger.info('Getting finished RW Laplacian matrix')
+        logger.info('Getting RW Laplacian matrix')
         L = I - D_1*A
+        logger.info('Finshed RW Laplacian matrix')
 
     L_double = L.asfptype()
 
