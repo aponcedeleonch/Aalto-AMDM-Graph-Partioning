@@ -158,7 +158,7 @@ def merge_clusters_edges(G, final_k, node_cluster, num_clusters, merge_need, log
         # If there is still 2 clusters with same size then choose one at random
         if len(list_min_distances) > 1:
             idxs = list(range(len(list_min_distances)))
-            idx_merge = np.random.choice(idxs, size=1)
+            idx_merge = np.random.choice(idxs, size=1)[0]
         else:
             idx_merge = np.argmin(distances)
         logger.debug('Choosing to merge clusters in index: %d' % (idx_merge))
