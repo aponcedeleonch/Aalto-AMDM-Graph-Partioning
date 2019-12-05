@@ -136,7 +136,7 @@ def get_clustering(G, k_eigenvec, k, clustering, L, n, merge, logger):
             A = nx.adjacency_matrix(G)
             cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, A)
     else:
-        cluster_labels = multi_merger(G, k_eigenvec, k, clustering, n, logger)
+        cluster_labels = multi_merger(G, k_eigenvec, k, clustering, n, merge, logger)
         return cluster_labels
 
     cluster_labels = correct_cluster_labels(G, cluster_labels)
@@ -315,7 +315,7 @@ def recursive(G, k, c, clustering, n, logger):
             # Cluster using k-means
             _, cluster_labels = cluster_k_means(eigenvec_2, 2, logger)
         if (clustering =='Kmeans_modified'):
-            #Cluster usign modified Kmeans
+            # Cluster usign modified Kmeans
             logger.info('To merge %d nodes per cluster' % (n))
             cluster_labels = cluster_k_means_modified(G, n, k_eigenvec, k, logger)
             return cluster_labels
@@ -337,8 +337,8 @@ def recursive(G, k, c, clustering, n, logger):
         else:
             indicator = 0
             indicator2 = 1
-        nodes = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator]
-        accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label==indicator2]
+        nodes = [all_nodes[i] for i, label in enumerate(cluster_labels) if label == indicator]
+        accepted_cluster = [all_nodes[i] for i, label in enumerate(cluster_labels) if label == indicator2]
         subgraph = G.subgraph(nodes)
         c[k-1] = accepted_cluster
         return recursive(subgraph, k-1, c, clustering, n, logger)

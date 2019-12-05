@@ -1,5 +1,5 @@
 from resources import (graphs_files, algorithms, clustering, OUT_FOLDER,
-                       COMP_FOLDER, laplacians, eigenvectors)
+                       COMP_FOLDER, laplacians, eigenvectors, merges)
 import sys
 import argparse
 import networkx as nx
@@ -9,6 +9,7 @@ import time
 import os
 from algorithms import (unorm, norm_lap, norm_eig, recursive, hagen_kahng,
                         score_function, norm_eig_col, unorm_eig, unorm_eig_col)
+
 
 # Parse script arguments
 def parse_args(graph_names, args=sys.argv[1:]):
@@ -43,10 +44,10 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         help="Indicate a custom number of k to get eigenvectors")
     # Merge clusters
     parser.add_argument("--merge", "-m",
-                        action="store_true",
+                        choices=merges,
                         help="If there is a k_custom then merge manually the extra clusters")
     # Argument to print to console
-    parser.add_argument("--log", "-l",
+    parser.add_argument("--log", "-lo",
                         type=str, help="Set logging level", default="INFO",
                         choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
     # Argument to name the log file
@@ -128,12 +129,12 @@ def run_algorithm(G, G_meta, algo, lap, eig, clustering, dump, cache,
             cluster_labels = unorm(G=G, G_meta=G_meta, clustering=clustering,
                                    dump=dump, cache=cache, k=k, n=n, merge=merge,
                                    logger=logger)
-        elif(algo == 'Norm'):
+        elif(eig == 'Norm'):
             logger.info('Normalize eigenvectors by row')
             cluster_labels = unorm_eig(G=G, G_meta=G_meta, clustering=clustering,
                                        dump=dump, cache=cache, k=k, n=n, merge=merge,
                                        logger=logger)
-        elif(algo == 'NormCol'):
+        elif(eig == 'NormCol'):
             logger.info('Normalize eigenvectors by col and row')
             cluster_labels = unorm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
                                            dump=dump, cache=cache, k=k, n=n, merge=merge,
@@ -145,12 +146,12 @@ def run_algorithm(G, G_meta, algo, lap, eig, clustering, dump, cache,
             cluster_labels = norm_lap(G=G, G_meta=G_meta, clustering=clustering,
                                       dump=dump, cache=cache, k=k, n=n, merge=merge,
                                       logger=logger)
-        elif(algo == 'Norm'):
+        elif(eig == 'Norm'):
             logger.info('Normalize eigenvectors by row')
             cluster_labels = norm_eig(G=G, G_meta=G_meta, clustering=clustering,
                                       dump=dump, cache=cache, k=k, n=n, merge=merge,
                                       logger=logger)
-        elif(algo == 'NormCol'):
+        elif(eig == 'NormCol'):
             logger.info('Normalize eigenvectors by col and row')
             cluster_labels = norm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
                                           dump=dump, cache=cache, k=k, n=n, merge=merge,
@@ -215,6 +216,8 @@ def main(logger):
     logger.info('************** Summary **************')
     logger.info('Graph: %s' % (G_meta['name']))
     logger.info('Algorithm used: %s' % (args.algo))
+    logger.info('Laplacian used: %s' % (args.laplacian))
+    logger.info('Eigenvectors used: %s' % (args.eigenvectors))
     logger.info('N to merge: %d' % (args.nodes))
     logger.info('K custom: %d' % (args.k_custom))
     logger.info('Dumping?: %s' % (args.dump))

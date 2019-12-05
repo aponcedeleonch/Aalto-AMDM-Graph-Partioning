@@ -17,6 +17,7 @@ algorithms = ['HagenKahng', 'Recursive']
 laplacians = ['Unorm', 'Norm']
 eigenvectors = ['None', 'Norm', 'NormCol']
 clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified']
+merges = ['edges', 'size']
 
 OUT_FOLDER = './outputs'
 COMP_FOLDER = './computed'
@@ -24,7 +25,7 @@ COMP_FOLDER = './computed'
 
 def score_function(clustered, k, G, logger):
     equal_partition = G.number_of_nodes()/k
-    logger.debug('Ideal balanced clusters: %.10f' % (equal_partition))
+    logger.info('Ideal balanced clusters: %.10f' % (equal_partition))
     logger.debug('Getting score for the clustering')
     k_score = []
     # Iterate over the k clusters
@@ -32,7 +33,7 @@ def score_function(clustered, k, G, logger):
         # Get the nodes that were classified as the cluster k
         indexes = np.where(clustered == i)[0]
         cluster_size = len(indexes)
-        logger.debug('Cluster: %d. Number of nodes: %d' % (i, cluster_size))
+        logger.info('Cluster: %d. Number of nodes: %d' % (i, cluster_size))
         edge_diff_cluster = 0
         # Iterate over the nodes in cluster k
         for idx in indexes:
@@ -45,7 +46,7 @@ def score_function(clustered, k, G, logger):
                     edge_diff_cluster += 1
         # Get the score for the cluster k. Store it
         cluster_score = edge_diff_cluster/cluster_size
-        logger.debug('Cluster: %d. Edges cutting clusters: %d' % (i, edge_diff_cluster))
+        logger.info('Cluster: %d. Edges cutting clusters: %d' % (i, edge_diff_cluster))
         logger.debug('Cluster: %d. Score: %.10f' % (i, cluster_score))
         k_score.append(cluster_score)
     return sum(k_score)
