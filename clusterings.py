@@ -256,7 +256,7 @@ def merge_clusters_size(G, final_k, node_cluster, num_clusters, merge_need, logg
         # If there is still 2 clusters with same number of outgoing cutting edges select random
         if len(list_max_edges_cutting) > 1:
             idxs = list(range(len(list_max_edges_cutting)))
-            idx_merge = np.random.choice(idxs, size=1)
+            idx_merge = np.random.choice(idxs, size=1)[0]
         else:
             idx_merge = np.argmax(num_edges_cutting)
     else:
