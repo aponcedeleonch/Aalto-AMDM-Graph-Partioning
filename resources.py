@@ -13,7 +13,9 @@ graphs_files = {
     'dummy': 'graphs_processed/dummy.txt'
 }
 
-algorithms = ['Unorm', 'NormLap', 'NormEig', 'NormEigCol', 'HagenKahng', 'Recursive']
+algorithms = ['HagenKahng', 'Recursive']
+laplacians = ['Unorm', 'Norm']
+eigenvectors = ['None', 'Norm', 'NormCol']
 clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified']
 
 OUT_FOLDER = './outputs'

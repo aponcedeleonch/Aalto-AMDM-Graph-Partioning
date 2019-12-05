@@ -1,5 +1,5 @@
 from resources import (graphs_files, algorithms, clustering, OUT_FOLDER,
-                       COMP_FOLDER)
+                       COMP_FOLDER, laplacians, eigenvectors)
 import sys
 import argparse
 import networkx as nx
@@ -8,7 +8,7 @@ import logging
 import time
 import os
 from algorithms import (unorm, norm_lap, norm_eig, recursive, hagen_kahng,
-                        score_function, norm_eig_col)
+                        score_function, norm_eig_col, unorm_eig, unorm_eig_col)
 
 # Parse script arguments
 def parse_args(graph_names, args=sys.argv[1:]):
@@ -18,17 +18,25 @@ def parse_args(graph_names, args=sys.argv[1:]):
                         type=str, required=True,
                         help="Graph to execute the algorithm",
                         choices=graph_names)
-    # Use different algorithms to run the script
-    parser.add_argument("--algo", "-a",
-                        type=str, help="Indicate normalization", default="Unorm",
-                        choices=algorithms)
+    # Use different laplacians to run the script
+    parser.add_argument("--laplacian", "-l",
+                        type=str, help='Type of Laplacian to compute',
+                        required=True, choices=laplacians)
+    # Use different eigenvectors to run the script
+    parser.add_argument("--eigenvectors", "-e",
+                        type=str, help='Type of Eigenvectos to compute',
+                        required=True, choices=eigenvectors)
     # Use different cluster algorithms to run the script
     parser.add_argument("--cluster", "-c",
                         type=str, help="Indicate clustering", default="Kmeans",
                         choices=clustering)
+    # Use different algorithms to run the script
+    parser.add_argument("--algo", "-a", default='',
+                        type=str, help="Indicate normalization",
+                        choices=algorithms)
     parser.add_argument("--nodes", "-n",
                         type=int, default=0,
-                        help="Nodes to mergge in modified Kmans")
+                        help="Nodes to merge in modified Kmans")
     # Use more than k eigenvectors to run the clustering
     parser.add_argument("--k_custom", "-k",
                         type=int, default=0,
@@ -111,25 +119,45 @@ def output_file(g_meta, clustered, logger):
     return out_name, header + cluster_str
 
 
-def run_algorithm(G, G_meta, algo, clustering, dump, cache, k, n, merge, logger):
-    logger.info('Going to execute algorithm: %s' % (algo))
-    if (algo == 'Unorm'):
-        cluster_labels = unorm(G=G, G_meta=G_meta, clustering=clustering,
-                               dump=dump, cache=cache, k=k, n=n, merge=merge,
-                               logger=logger)
-    elif (algo == 'NormLap'):
-        cluster_labels = norm_lap(G=G, G_meta=G_meta, clustering=clustering,
-                                  dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                  logger=logger)
-    elif(algo == 'NormEig'):
-        cluster_labels = norm_eig(G=G, G_meta=G_meta, clustering=clustering,
-                                  dump=dump, cache=cache, k=k, n=n, merge=merge,
-                                  logger=logger)
-    elif(algo == 'NormEigCol'):
-        cluster_labels = norm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
+def run_algorithm(G, G_meta, algo, lap, eig, clustering, dump, cache,
+                  k, n, merge, logger):
+    if (lap == 'Unorm'):
+        logger.info('Going to use unormalized Laplacian matrix')
+        if (eig == 'None'):
+            logger.info('Not going to normalize eigenvectors')
+            cluster_labels = unorm(G=G, G_meta=G_meta, clustering=clustering,
+                                   dump=dump, cache=cache, k=k, n=n, merge=merge,
+                                   logger=logger)
+        elif(algo == 'Norm'):
+            logger.info('Normalize eigenvectors by row')
+            cluster_labels = unorm_eig(G=G, G_meta=G_meta, clustering=clustering,
+                                       dump=dump, cache=cache, k=k, n=n, merge=merge,
+                                       logger=logger)
+        elif(algo == 'NormCol'):
+            logger.info('Normalize eigenvectors by col and row')
+            cluster_labels = unorm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
+                                           dump=dump, cache=cache, k=k, n=n, merge=merge,
+                                           logger=logger)
+    elif (lap == 'Norm'):
+        logger.info('Going to use normalized Laplacian matrix')
+        if (eig == 'None'):
+            logger.info('Not going to normalize eigenvectors')
+            cluster_labels = norm_lap(G=G, G_meta=G_meta, clustering=clustering,
                                       dump=dump, cache=cache, k=k, n=n, merge=merge,
                                       logger=logger)
-    elif(algo == 'Recursive'):
+        elif(algo == 'Norm'):
+            logger.info('Normalize eigenvectors by row')
+            cluster_labels = norm_eig(G=G, G_meta=G_meta, clustering=clustering,
+                                      dump=dump, cache=cache, k=k, n=n, merge=merge,
+                                      logger=logger)
+        elif(algo == 'NormCol'):
+            logger.info('Normalize eigenvectors by col and row')
+            cluster_labels = norm_eig_col(G=G, G_meta=G_meta, clustering=clustering,
+                                          dump=dump, cache=cache, k=k, n=n, merge=merge,
+                                          logger=logger)
+
+    if(algo == 'Recursive'):
+        logger.info('Going to execute algorithm: %s' % (algo))
         # Empty dictionary to track  labels
         k = G_meta['k']
         c = {}
@@ -139,9 +167,11 @@ def run_algorithm(G, G_meta, algo, clustering, dump, cache, k, n, merge, logger)
             for j in cluster_labels[i]:
                 np_labels[int(j)] = i
         cluster_labels = np_labels
+        logger.info('Algorithm execution finished: %s' % (algo))
     elif(algo == 'HagenKahng'):
+        logger.info('Going to execute algorithm: %s' % (algo))
         cluster_labels = hagen_kahng(G, G_meta, cache, logger)
-    logger.info('Algorithm execution finished: %s' % (algo))
+        logger.info('Algorithm execution finished: %s' % (algo))
 
     return cluster_labels
 
@@ -164,6 +194,7 @@ def main(logger):
         k = args.k_custom
 
     cluster_labels = run_algorithm(G=G, G_meta=G_meta, algo=args.algo,
+                                   lap=args.laplacian, eig=args.eigenvectors,
                                    clustering=args.cluster, dump=args.dump,
                                    cache=args.no_cache, k=k, n=args.nodes,
                                    merge=args.merge, logger=logger)
