@@ -97,25 +97,6 @@ def get_laplacian(G, lap, logger):
     elif 'Unorm' == lap:
         logger.info('Getting Unormalized Laplacian matrix')
         L = nx.laplacian_matrix(G)
-    elif 'RW' == lap:
-        logger.info('Starting to get Random Walk Laplacian matrix')
-        logger.info('Getting Adjacency matrix')
-        A = nx.adjacency_matrix(G)
-        logger.info('Getting Degree matrix')
-        D = A.sum(0)
-        logger.info('Transforming D matrix to vector')
-        D = np.squeeze(np.asarray(D))
-        nodes = G.number_of_nodes()
-        rows_cols = np.array(range(nodes))
-        logger.info('Getting Sparse Degree matrix')
-        D = sparse.csc_matrix((D, (rows_cols, rows_cols)))
-        logger.info('Getting Inverse of Degree matrix')
-        D_1 = sparse.linalg.inv(D)
-        logger.info('Getting Identity matrix')
-        I = sparse.csr_matrix((np.ones(nodes), (rows_cols, rows_cols)))
-        logger.info('Getting RW Laplacian matrix')
-        L = I - D_1*A
-        logger.info('Finshed RW Laplacian matrix')
 
     L_double = L.asfptype()
 

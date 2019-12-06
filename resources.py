@@ -14,7 +14,7 @@ graphs_files = {
 }
 
 algorithms = ['HagenKahng', 'Recursive', 'LaplacianEigenvectors']
-laplacians = ['Unorm', 'Norm', 'RW']
+laplacians = ['Unorm', 'Norm']
 eigenvectors = ['None', 'Norm', 'NormCol']
 clustering = ['Kmeans', 'Gmm', 'Agglomerative', 'Kmeans_modified']
 merges = ['edges', 'size']
