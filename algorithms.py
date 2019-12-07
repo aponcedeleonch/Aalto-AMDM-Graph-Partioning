@@ -161,8 +161,8 @@ def get_clustering(G, k_eigenvec, k, clustering, L, n, merge, logger):
         if (clustering == "Agglomerative"):
             # Cluster using agglomerative algorithm
             # cluster_labels = cluster_agglomerative(k_eigenvec, k, logger)
-            A = nx.adjacency_matrix(G)
-            cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, A)
+            # A = nx.adjacency_matrix(G)
+            cluster_labels = cluster_agglomerative(k_eigenvec, k, logger, L)
     else:
         cluster_labels = multi_merger(G, k_eigenvec, k, clustering, n, merge, logger)
         return cluster_labels
