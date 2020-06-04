@@ -6,6 +6,12 @@ Developed by:
 * Erick Gijon Leyva
 * Alejandro Ponce de León Chávez
 
+The purpose of this project is to use different algorithms to get ideal partioning on different graphs given a scoring function. The score for the partioning can be calculated as follows:
+
+<img src="https://latex.codecogs.com/gif.latex?\phi(V_1,...,V_k)=\sum^k_{i=1}\frac{|E(V_i,&space;\bar{V_i})|}{|V_i|}" title="\phi(V_1,...,V_k)=\sum^k_{i=1}\frac{|E(V_i,&space;\bar{V_i})|}{|V_i|}"/>
+
+Where Vi is a partition of the graph and E is the set of edges in Vi that have on endpoint in Vi and another one in Vi-bar.
+
 ### Useful links
 
 Links to libraries used during the realization of the project
